@@ -1,5 +1,5 @@
-# Fontlab7-python-scripts
-Python scripts for Fontlab 7.
+# Fontlab-python-scripts
+Python scripts for Fontlab 7 and 8.
 
 ---
 
