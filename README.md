@@ -14,7 +14,7 @@ Transform glyphs by adjusting the length of the sides of a rectangular glyph spa
 ---
 
 ## Generate Hangeul Composition 
-Base code forked from Hangulpy
+Hangeul composition code forked from Hangulpy
 
 https://github.com/rhobot/Hangulpy
 
