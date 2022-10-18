@@ -64,7 +64,7 @@ LAST_HANGUL_UNICODE = 0xD7A3  # '힣'
 
 global SORT_ORDER, CHAR_RANGE
 SORT_ORDER = 0  
-# 0: 초성순(=유니코드순) // 1: 중성순 // 2: 중성-모임꼴 순 // 3: 종성순
+# 0: 초성순(=유니코드순) // 1: 중성순 // 2: 종성순
 
 CHAR_RANGE = 0 
 # 0: KSX1001 2350자 // 1: ADOBE KR9 2780자 // 2: 11172자
@@ -217,7 +217,7 @@ def composeAllCases(chosung = [u''], jungsung = [u''], jongsung = [u''], jung_by
                         continue
                     composedChrList.append(letter)
                 if line_break: 
-                    if composedChrList[-1] != '\n' :
+                    if len(composedChrList)>0 and composedChrList[-1] != '\n' :
                         composedChrList.append('\n')
                     else: continue
     if SORT_ORDER == 1 :
@@ -228,7 +228,10 @@ def composeAllCases(chosung = [u''], jungsung = [u''], jongsung = [u''], jung_by
                     if not letter : 
                         continue
                     composedChrList.append(letter)
-            if line_break: composedChrList.append('\n')
+            if line_break: 
+                if len(composedChrList)>0 and composedChrList[-1] != '\n' :
+                    composedChrList.append('\n')
+                else: continue
     if SORT_ORDER == 2:
         for jong in jongsung:
             for cho in chosung :
@@ -237,7 +240,10 @@ def composeAllCases(chosung = [u''], jungsung = [u''], jongsung = [u''], jung_by
                     if not letter : 
                         continue
                     composedChrList.append(letter)
-                    if line_break:  composedChrList.append('\n')
+                    if line_break:
+                        if len(composedChrList)>0 and composedChrList[-1] != '\n' :
+                            composedChrList.append('\n')
+                        else: continue
 
     # print(''.join(composedChrList))
     return composedChrList
@@ -400,7 +406,7 @@ self.btnGrp_jong.addButton(self.btn_jong_{idx}, {idx})
 
         # -- CheckBoxes 
         self.chkbox_sortByJung = QtGui.QCheckBox('중성 모임꼴 순 정렬')
-        self.chkbox_lineBreak = QtGui.QCheckBox('중성 별 줄바꿈')
+        self.chkbox_lineBreak = QtGui.QCheckBox('중성별 줄바꿈')
 
         # -- Tooltips
         self.btn_selectAll_cho.setToolTip(u'전체 자소를 선택합니다.')
@@ -416,7 +422,7 @@ self.btnGrp_jong.addButton(self.btn_jong_{idx}, {idx})
         self.btn_editOnCurTab.setToolTip(u'조합된 문자열을 현재 글리프 윈도우에서 편집합니다.')
         self.btn_editOnNewTab.setToolTip(u'조합된 문자열을 새 글리프 윈도우에서 편집합니다.')
         self.chkbox_sortByJung.setToolTip(u'모임꼴 순으로 중성을 정렬합니다.')
-        self.chkbox_lineBreak.setToolTip(u'조합된 문자열을 중성 별로 줄바꿈합니다.')
+        self.chkbox_lineBreak.setToolTip(u'조합된 문자열을 중성별로 줄바꿈합니다.')
         self.btn_compose.setToolTip(u'선택한 자소를 조합합니다.')
         self.btn_close.setToolTip(u'스크립트를 종료합니다.')
         self.comboBox_charRange.setToolTip(u'조합할 한글의 범위를 선택합니다.')
