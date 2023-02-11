@@ -297,7 +297,6 @@ class WTreeWidget(QtGui.QTreeWidget):
         print(data)
         for eGlyph in sorted(data, key = lambda x: x.name):
             slicedName = list(eGlyph.name.partition('.')) # ex) ['uniAC00','alt'] from 'uniAC00.alt' 
-            print(slicedName)
             try: 
                 #           ex) ['index',   'character',    'name',         'unicode',      'tag']
                 #           ex) ['10',      '가.001',       'uniAC00.001',  '0xAC00.001',   '']
