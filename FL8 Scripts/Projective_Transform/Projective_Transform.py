@@ -294,14 +294,24 @@ class WTreeWidget(QtGui.QTreeWidget):
         self.blockSignals(True)
         self.clear()
         self.setHeaderLabels(column_names)
-
+        print(data)
         for eGlyph in sorted(data, key = lambda x: x.name):
-            slicedName = list(eGlyph.name.partition('.'))
+            slicedName = list(eGlyph.name.partition('.')) # ex) ['uniAC00','alt'] from 'uniAC00.alt' 
+            print(slicedName)
             try: 
+                #           ex) ['index',   'character',    'name',         'unicode',      'tag']
+                #           ex) ['10',      '가.001',       'uniAC00.001',  '0xAC00.001',   '']
                 treeItemList =  [eGlyph.index, concatStr(chr(nT.unc(slicedName[0])), ''.join(slicedName[1:])), ''.join(slicedName), concatStr(format((nT.unc(slicedName[0])), '#06X'),''.join(slicedName[1:])), ','.join(eGlyph.tags)]
-            except: 
+            except TypeError as t:
+                print(t)
                 uni_32bit_name = '\\U%s' %format(nT.unc(slicedName[0]), '08x')
                 treeItemList =  [eGlyph.index, bytes(uni_32bit_name).decode('unicode_escape'), ''.join(slicedName), concatStr(format((nT.unc(slicedName[0])), '#08X'),''.join(slicedName[1:])), ','.join(eGlyph.tags)]
+
+            except ValueError as v:
+                print(v)
+                treeItemList =  [eGlyph.index, ''.join(slicedName), ''.join(slicedName), '', ','.join(eGlyph.tags)]
+
+
             glyph = QtGui.QTreeWidgetItem(self, treeItemList)
         self.blockSignals(False)
         self.setSelectionMode(0) #QAbstractItemView::NoSelection	    
