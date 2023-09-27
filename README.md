@@ -44,43 +44,43 @@ Batch apply color flags to selected glyphs.
 Add actions to the Contour Tool's toolbox.  
 <br><br>
 
-### Set X Distance (Shift + x)
-<img src="./img/Toolbox_Utilities_2.png" width="300"/>
-
-Before|After
----|---
-![](./img/Toolbox_Utilities_2-1.png)|![](./img/Toolbox_Utilities_2-2.png)
-
-선택한 중복 노드 사이의 X축 방향 거리를 설정합니다.
-
-Set the x-axis distance between the selected duplicate nodes.
-<br><br>
-
-### Set Y Distance (Shift + y)
-<img src="./img/Toolbox_Utilities_3.png" width="300"/>
-
-Before|After
----|---
-![](./img/Toolbox_Utilities_4-1.png)|![](./img/Toolbox_Utilities_3-2.png)
-
-선택한 중복 노드 사이의 Y축 방향 거리를 설정합니다.
-
-Set the y-axis distance between the selected duplicate nodes.
-<br><br>
-
-
-###  Duplicate Nodes (Ctrl + Alt + x)
-<img src="./img/Toolbox_Utilities_4.png" width="300"/>
-
-Before|After
----|---
-![](./img/Toolbox_Utilities_4-1.png)|![](./img/Toolbox_Utilities_4-2.png)
-
-선택한 노드를 복제합니다.
-
-Duplicate selected nodes.
-<br><br>
-
+> ### Set X Distance (Shift + x)
+> <img src="./img/Toolbox_Utilities_2.png" width="300"/>
+> 
+> Before|After
+> ---|---
+> ![](./img/Toolbox_Utilities_2-1.png)|![](./img/Toolbox_Utilities_2-2.png)
+> 
+> 선택한 중복 노드 사이의 X축 방향 거리를 설정합니다.
+> 
+> Set the x-axis distance between the selected duplicate nodes.
+> <br><br>
+> 
+> ### Set Y Distance (Shift + y)
+> <img src="./img/Toolbox_Utilities_3.png" width="300"/>
+> 
+> Before|After
+> ---|---
+> ![](./img/Toolbox_Utilities_4-1.png)|![](./img/Toolbox_Utilities_3-2.png)
+> 
+> 선택한 중복 노드 사이의 Y축 방향 거리를 설정합니다.
+> 
+> Set the y-axis distance between the selected duplicate nodes.
+> <br><br>
+> 
+> 
+> ###  Duplicate Nodes (Ctrl + Alt + x)
+> <img src="./img/Toolbox_Utilities_4.png" width="300"/>
+> 
+> Before|After
+> ---|---
+> ![](./img/Toolbox_Utilities_4-1.png)|![](./img/Toolbox_Utilities_4-2.png)
+> 
+> 선택한 노드를 복제합니다.
+> 
+> Duplicate selected nodes.
+> <br><br>
+> 
 > ###  Select Entire Contour (Shift + `)
 > <img src="./img/Toolbox_Utilities_5.png" width="300"/>
 >
@@ -93,13 +93,13 @@ Duplicate selected nodes.
 > Select Entire Contour to Which Selected Nodes or Handles Belong.
 > <br><br>
 > 
-###  Form Symmetrical Circle (Shift + o)
-<img src="./img/Toolbox_Utilities_6.png" width="300"/>
-
-Before|After
----|---
-![](./img/Toolbox_Utilities_6-1.png)|![](./img/Toolbox_Utilities_6-2.png)
-
-노드를 복사하고 뒤집어 붙여넣어 대칭 원을 만듭니다.
-
-Copy, Flip, Paste Nodes to Form a Symmetrical Circle.  
+> ###  Form Symmetrical Circle (Shift + o)
+> <img src="./img/Toolbox_Utilities_6.png" width="300"/>
+> 
+> Before|After
+> ---|---
+> ![](./img/Toolbox_Utilities_6-1.png)|![](./img/Toolbox_Utilities_6-2.png)
+> 
+> 노드를 복사하고 뒤집어 붙여넣어 대칭 원을 만듭니다.
+> 
+> Copy, Flip, Paste Nodes to Form a Symmetrical Circle.  
