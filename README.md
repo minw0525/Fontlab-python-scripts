@@ -46,8 +46,11 @@ Add actions to the Contour Tool's toolbox.
 
 ### Set X Distance (Shift + x)
 ![](./img/Toolbox_Utilities_2.png)
-![](./img/Toolbox_Utilities_2-1.png)
-![](./img/Toolbox_Utilities_2-2.png)
+
+Before|After
+:-------------------------:|:-------------------------:
+![](./img/Toolbox_Utilities_2-1.png)|![](./img/Toolbox_Utilities_2-2.png)
+
 
 선택한 중복 노드 사이의 X축 방향 거리를 설정합니다.
 
