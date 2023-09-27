@@ -45,7 +45,7 @@ Add actions to the Contour Tool's toolbox.
 <br><br>
 
 ### Set X Distance (Shift + x)
-<img src="./img/Toolbox_Utilities_2.png" width="250"/>
+<img src="./img/Toolbox_Utilities_2.png" width="300"/>
 
 Before|After
 ---|---
@@ -57,7 +57,7 @@ Set the x-axis distance between the selected duplicate nodes.
 <br><br>
 
 ### Set Y Distance (Shift + y)
-<img src="./img/Toolbox_Utilities_3.png" width="250"/>
+<img src="./img/Toolbox_Utilities_3.png" width="300"/>
 
 Before|After
 ---|---
@@ -70,7 +70,7 @@ Set the y-axis distance between the selected duplicate nodes.
 
 
 ###  Duplicate Nodes (Ctrl + Alt + x)
-<img src="./img/Toolbox_Utilities_4.png" width="250"/>
+<img src="./img/Toolbox_Utilities_4.png" width="300"/>
 
 Before|After
 ---|---
@@ -81,20 +81,20 @@ Before|After
 Duplicate selected nodes.
 <br><br>
 
-###  Select Entire Contour (Shift + `)
-<img src="./img/Toolbox_Utilities_5.png" width="250"/>
-
-Before|After
----|---
-![](./img/Toolbox_Utilities_5-1.png)|![](./img/Toolbox_Utilities_5-2.png)
-
-선택한 노드 또는 핸들이 속한 전체 컨투어를 선택합니다.
-
-Select Entire Contour to Which Selected Nodes or Handles Belong.
-<br><br>
-
+> ###  Select Entire Contour (Shift + `)
+> <img src="./img/Toolbox_Utilities_5.png" width="300"/>
+>
+> Before|After
+> ---|---
+> ![](./img/Toolbox_Utilities_5-1.png)|![](./img/Toolbox_Utilities_5-2.png)
+> 
+> 선택한 노드 또는 핸들이 속한 전체 컨투어를 선택합니다.
+> 
+> Select Entire Contour to Which Selected Nodes or Handles Belong.
+> <br><br>
+> 
 ###  Form Symmetrical Circle (Shift + o)
-<img src="./img/Toolbox_Utilities_6.png" width="250"/>
+<img src="./img/Toolbox_Utilities_6.png" width="300"/>
 
 Before|After
 ---|---
