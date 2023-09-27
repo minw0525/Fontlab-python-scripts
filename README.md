@@ -48,7 +48,7 @@ Add actions to the Contour Tool's toolbox.
 ![](./img/Toolbox_Utilities_2.png)
 
 Before|After
-:-------------------------:|:-------------------------:
+---|---
 ![](./img/Toolbox_Utilities_2-1.png)|![](./img/Toolbox_Utilities_2-2.png)
 
 
