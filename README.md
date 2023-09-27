@@ -42,10 +42,10 @@ Batch apply color flags to selected glyphs.
 컨투어 툴의 툴박스에 액션을 추가합니다.
 
 Add actions to the Contour Tool's toolbox.  
-<br>
+<br><br>
 
 ### Set X Distance (Shift + x)
-![](./img/Toolbox_Utilities_2.png | width=100)
+<img src="./img/Toolbox_Utilities_2.png" width="250"/>
 
 Before|After
 ---|---
@@ -54,10 +54,10 @@ Before|After
 선택한 중복 노드 사이의 X축 방향 거리를 설정합니다.
 
 Set the x-axis distance between the selected duplicate nodes.
-<br>
+<br><br>
 
 ### Set Y Distance (Shift + y)
-![](./img/Toolbox_Utilities_3.png | width=100)
+<img src="./img/Toolbox_Utilities_3.png" width="250"/>
 
 Before|After
 ---|---
@@ -66,10 +66,11 @@ Before|After
 선택한 중복 노드 사이의 Y축 방향 거리를 설정합니다.
 
 Set the y-axis distance between the selected duplicate nodes.
-<br>
+<br><br>
+
 
 ###  Duplicate Nodes (Ctrl + Alt + x)
-![](./img/Toolbox_Utilities_4.png | width=100)
+<img src="./img/Toolbox_Utilities_4.png" width="250"/>
 
 Before|After
 ---|---
@@ -78,10 +79,10 @@ Before|After
 선택한 노드를 복제합니다.
 
 Duplicate selected nodes.
-<br>
+<br><br>
 
 ###  Select Entire Contour (Shift + `)
-![](./img/Toolbox_Utilities_5.png | width=100)
+<img src="./img/Toolbox_Utilities_5.png" width="250"/>
 
 Before|After
 ---|---
@@ -90,10 +91,10 @@ Before|After
 선택한 노드 또는 핸들이 속한 전체 컨투어를 선택합니다.
 
 Select Entire Contour to Which Selected Nodes or Handles Belong.
-<br>
+<br><br>
 
 ###  Form Symmetrical Circle (Shift + o)
-![](./img/Toolbox_Utilities_6.png | width=100)
+<img src="./img/Toolbox_Utilities_6.png" width="250"/>
 
 Before|After
 ---|---
