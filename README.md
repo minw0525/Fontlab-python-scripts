@@ -93,7 +93,7 @@ Add actions to the Contour Tool's toolbox.
 > Select Entire Contour to Which Selected Nodes or Handles Belong.
 > <br><br>
 > 
-> ###  Form Symmetrical Circle (Shift + o)
+> ###  Form Symmetrical Circle (CapsLock)
 > <img src="./img/Toolbox_Utilities_6.png" width="300"/>
 > 
 > Before|After

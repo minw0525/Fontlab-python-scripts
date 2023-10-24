@@ -39,9 +39,9 @@ class Util:
         self.actionData = {
             "text" : ["metrics_advance","metrics_advance_vertical", "node_add", "corner_round", "sync"],
             "title" : ["Set X Distance","Set Y Distance", "Duplicate Nodes", "Select Entire Contour", "Form Symmetrical Circle"],
-            "tooltip" : ['Set X Distance (Shift+X): Set distance between duplicated nodes to 10.', 'Set Y Distance (Shift+Y): Set distance between duplicated nodes to 10.', 'Duplicate Nodes (Ctrl+Alt+D): Duplicate selected nodes.', 'Select Contour (Shift+`): Select Entire Contour to Which Selected Nodes or Handles Belong.', 'Form Symmetrical Circle (Shift+O): Copy, Flip, Paste Nodes to Form a Symmetrical Circle.'],
+            "tooltip" : ['Set X Distance (Shift+X): Set distance between duplicated nodes to 10.', 'Set Y Distance (Shift+Y): Set distance between duplicated nodes to 10.', 'Duplicate Nodes (Ctrl+Alt+D): Duplicate selected nodes.', 'Select Contour (CapsLock): Select Entire Contour to Which Selected Nodes or Handles Belong.', 'Form Symmetrical Circle (Shift+O): Copy, Flip, Paste Nodes to Form a Symmetrical Circle.'],
             "slot" : [self.setXDistance, self.setYDistance, self.duplicateNodes, self.selectEntireContour, self.flipToSymmetricCircle],
-            "shortcut" : ['Shift+x', 'Shift+y', 'Ctrl+Alt+d', 'Shift+`', 'Shift+o']
+            "shortcut" : ['Shift+x', 'Shift+y', 'Ctrl+Alt+d', 'CapsLock', 'Shift+o']
         }
     def setNodeSelection(func):
         def setter(self):
