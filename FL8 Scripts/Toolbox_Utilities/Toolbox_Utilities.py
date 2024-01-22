@@ -1,5 +1,4 @@
 #FLM: MW: Toolbox Utilities
-
 from math import radians, dist, pi, atan 
 # from collections import OrderedDict
 # from itertools import groupby
@@ -39,9 +38,9 @@ class Util:
         self.actionData = {
             "text" : ["metrics_advance","metrics_advance_vertical", "node_add", "corner_round", "sync"],
             "title" : ["Set X Distance","Set Y Distance", "Duplicate Nodes", "Select Entire Contour", "Form Symmetrical Circle"],
-            "tooltip" : ['Set X Distance (Shift+X): Set distance between duplicated nodes to 10.', 'Set Y Distance (Shift+Y): Set distance between duplicated nodes to 10.', 'Duplicate Nodes (Ctrl+Alt+D): Duplicate selected nodes.', 'Select Contour (CapsLock): Select Entire Contour to Which Selected Nodes or Handles Belong.', 'Form Symmetrical Circle (Shift+O): Copy, Flip, Paste Nodes to Form a Symmetrical Circle.'],
+            "tooltip" : ['Set X Distance (Shift+X): Set distance between duplicated nodes to 10.', 'Set Y Distance (Shift+Y): Set distance between duplicated nodes to 10.', 'Duplicate Nodes (Ctrl+Alt+D): Duplicate selected nodes.', 'Select Contour (`): Select Entire Contour to Which Selected Nodes or Handles Belong.', 'Form Symmetrical Circle (Shift+O): Copy, Flip, Paste Nodes to Form a Symmetrical Circle.'],
             "slot" : [self.setXDistance, self.setYDistance, self.duplicateNodes, self.selectEntireContour, self.flipToSymmetricCircle],
-            "shortcut" : ['Shift+x', 'Shift+y', 'Ctrl+Alt+d', 'CapsLock', 'Shift+o']
+            "shortcut" : ['Shift+x', 'Shift+y', 'Ctrl+Alt+d', '`', 'Shift+o']
         }
     def setNodeSelection(func):
         def setter(self):
@@ -329,7 +328,10 @@ class Button(QtGui.QToolButton):
             if child.text == UtilClass.actionData["text"][self.idx]:
                 return
         widgetLayout = self.widget.layout()
-        widgetLayout.insertWidget(widgetLayout.count() - 1, self)
+        spacer = QtGui.QSpacerItem(2,20)
+        if not widgetLayout.itemAt(widgetLayout.count() - 2).spacerItem() :
+            widgetLayout.insertItem(widgetLayout.count() - 2, spacer)
+            widgetLayout.insertWidget(widgetLayout.count() - 2, self)
 
 
 class Action(QtGui.QAction):
@@ -387,10 +389,13 @@ class Action(QtGui.QAction):
 def run() :
     if main.findChild('WidgetNodes','WidgetNodes') :
         widgetnodes = main.findChild('WidgetNodes','WidgetNodes')
+
         for i in range(len(UtilClass.actionData["text"])):
             btn = Button(i, widgetnodes)
             btn.insertSelf()
-        widgetnodes.setGeometry(100,200,202,38)
+
+        widgetnodes.setMaximumSize(1000,16777215)
+        widgetnodes.resize(widgetnodes.minimumWidth + 125 + 25,38)
         widgetnodes.setWindowFlags(widgetnodes.windowFlags() & ~QtCore.Qt.WindowStaysOnTopHint)
         widgetnodes.show()
     # else:    
