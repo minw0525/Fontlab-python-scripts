@@ -58,7 +58,7 @@ QLabel{
 
 QSS2 = '''
 QPushButton{
-    width: 15px;
+    width: 14px;
     height: 20px;
     font-size: 13px;
     margin: 0;
@@ -110,7 +110,35 @@ class CustomSlider(QtGui.QSlider):
             value = (self.maximum - self.minimum) * x / self.width + self.minimum
             self.aux.updateChange()
 
+class CustomLineEdit(QtGui.QLineEdit):
+    def __init__(self, aux):
+        super(CustomLineEdit, self).__init__()
 
+        self.aux = aux
+        self.setValidator(QtGui.QDoubleValidator(0, 1000, 2) )
+        self.setMaximumHeight(30)
+        self.increment = 1 
+
+    def keyPressEvent(self, e):
+        # modifiers = QtGui.QApplication.keyboardModifiers()
+        if e.modifiers() & QtCore.Qt.ControlModifier :
+            multiply = 100
+        elif e.modifiers() & QtCore.Qt.ShiftModifier :
+            multiply = 10
+        else :
+            multiply = 1
+            
+        if e.key() == QtCore.Qt.Key_Up:
+            self.setText(int(self.text) + self.increment * multiply)
+            self.aux.onLineEditChange()
+        if e.key() == QtCore.Qt.Key_Down:
+            self.setText(int(self.text) - self.increment * multiply)
+            self.aux.onLineEditChange()
+        
+        QtGui.QLineEdit.keyPressEvent(self, e)
+
+
+        
 class SliderControl(QtGui.QWidget):
     def __init__(self, data, aux):
         super(SliderControl, self).__init__()
@@ -131,9 +159,7 @@ class SliderControl(QtGui.QWidget):
         self.locSlider.sliderReleased.connect(self.updateChange)
 
         # self.locSlider.setMinimumWidth(self.locSlider.width)
-        self.locEdit = QtGui.QLineEdit()
-        self.locEdit.setValidator(QtGui.QDoubleValidator(0, 1000, 2) )
-        self.locEdit.setMaximumHeight(30)
+        self.locEdit = CustomLineEdit(self)
 
         #Layout
         self.vLayout = QtGui.QVBoxLayout()
@@ -166,14 +192,10 @@ class SliderControl(QtGui.QWidget):
 
     def onSliderChange(self):
         self.updateValue(self.locSlider.value)
-        fl6.flItems.notifyChangesApplied(f"Set Component Location: {self.axis}={self.locSlider.value}", self.aux.glyph.fl, True)
 
-
-    
     def onLineEditChange(self):
         self.updateValue(int(self.locEdit.text))
         self.updateChange()
-
 
     def mousePressEvent(self, e):
         printL('Slidercontrol press')
@@ -183,15 +205,11 @@ class SliderControl(QtGui.QWidget):
             self.aux.dragPos = value
             printL(108, value)
 
-
     def mouseReleaseEvent(self, e):
         self.updateChange()
 
     def updateChange(self):
-        # self.aux.selectedShape.update()
-        # printL(122,self.aux.selectedShape, self.aux.glyph, self.aux.locData )
-        self.aux.glyph.updateObject(self.aux.glyph.fl, 'Set Component Location') 
-        # self.aux.selectedShape.updateObject(self.aux.currfont.fl, 'Set Component Location')
+        self.aux.glyph.updateObject(self.aux.glyph.fl, 'Set Component Location', False) 
 
 class StatusWidget(QtGui.QWidget):
     def __init__(self, aux):
@@ -428,7 +446,6 @@ class FloatingWindow(QtGui.QDockWidget):
     def setCornerMask(self, radius):
         path = QtGui.QPainterPath() 
         path.addRoundedRect(QtCore.QRectF(self.rect), radius, radius)
-        printL(self.rect)
         self.cornermask = QtGui.QRegion(path.toFillPolygon().toPolygon())
         self.setMask(self.cornermask)
 
@@ -438,7 +455,6 @@ class FloatingWindow(QtGui.QDockWidget):
             self.dragPos = e.globalPos()
 
     def refreshWidget(self):
-        printL(self.geometry)
         self.controlWidget.resetWidget()
 
         newheight = 0
