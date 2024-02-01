@@ -69,7 +69,7 @@ Add actions to the Contour Tool's toolbox.
 > <br><br>
 > 
 > 
-> ###  Duplicate Nodes (Ctrl + Alt + x)
+> ###  Duplicate Nodes (Ctrl + Alt + D)
 > <img src="./img/Toolbox_Utilities_4.png" width="300"/>
 > 
 > Before|After
@@ -81,7 +81,7 @@ Add actions to the Contour Tool's toolbox.
 > Duplicate selected nodes.
 > <br><br>
 > 
-> ###  Select Entire Contour (Shift + `)
+> ###  Select Entire Contour (`)
 > <img src="./img/Toolbox_Utilities_5.png" width="300"/>
 >
 > Before|After
@@ -93,7 +93,7 @@ Add actions to the Contour Tool's toolbox.
 > Select Entire Contour to Which Selected Nodes or Handles Belong.
 > <br><br>
 > 
-> ###  Form Symmetrical Circle (CapsLock)
+> ###  Form Symmetrical Circle (Shift + o)
 > <img src="./img/Toolbox_Utilities_6.png" width="300"/>
 > 
 > Before|After
