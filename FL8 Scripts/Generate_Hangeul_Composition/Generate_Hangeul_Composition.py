@@ -88,14 +88,11 @@ CHAR_RANGE_LIST = [ADOBE_KR9, KSX_1001]
 CHAR_RANGE_DICT= [{string : string for string in ADOBE_KR9}, {string : string for string in KSX_1001}]
 
 try:
-    JAMO_GROUP_DICT = flP.packageLib["com.Minwoo.GenerateHangeulTransform"]
-    print(92, JAMO_GROUP_DICT)
+    JAMO_GROUP_DICT = flP.packageLib["com.Minwoo.GenerateHangeulComposition"]
 except KeyError :
-    NEW_JAMO_DICT = {**flP.packageLib, "com.Minwoo.GenerateHangeulTransform": {x:[] for x in JAMO_LABEL_EN}}
+    NEW_JAMO_DICT = {**flP.packageLib, "com.Minwoo.GenerateHangeulComposition": {x:[] for x in JAMO_LABEL_EN}}
     flP.packageLib = NEW_JAMO_DICT
-    JAMO_GROUP_DICT = flP.packageLib["com.Minwoo.GenerateHangeulTransform"]
-    print(94, flP.packageLib["com.Minwoo.GenerateHangeulTransform"])
-    print(96, JAMO_GROUP_DICT)
+    JAMO_GROUP_DICT = flP.packageLib["com.Minwoo.GenerateHangeulComposition"]
 
 ################################################################################
 # Hangeul Compositing Functions
@@ -212,20 +209,16 @@ def composeAllCases(chosung = [u''], jungsung = [u''], jongsung = [u''], jung_by
     # if SORT_ORDER == 3 : print('SORT ORDER : 종성 순')
 
     # print('초성: %s, 중성: %s, 종성: %s' %(''.join(chosung), ''.join(jungsung), ''.join(jongsung)))
-    print(chosung, jungsung, jongsung)
     chosung = list(CHO) if is_cho(chosung)==[] else is_cho(chosung)
-    print(chosung, type(chosung))
     chosung.sort()
 
     jungsung = list(JUNG) if is_jung(jungsung)==[] else is_jung(jungsung)
-    print(jungsung, type(jungsung))
     if jung_by_type : 
         jungsung.sort(key=lambda x : JUNG_BY_TYPE.index(x))
     else: 
         jungsung.sort()
 
     jongsung = list(JONG) if is_jong(jongsung)==[] else is_jong(jongsung)
-    print(jongsung, type(jongsung))
     jongsung.sort()
 
     composedChrList = []
@@ -329,7 +322,7 @@ class ListWidget(QtGui.QListWidget):
         item.setData(256, self.comps)
         item.setText(','.join(self.comps))
         item.setFlags(1|2|16|32) # ItemIsSelectable | ItemIsEditable | ItemIsEnabled
-        print(320, item.data(256)) # UserRole
+        # print(320, item.data(256)) # UserRole
         self.addItem(item)
         self.aux.unselectAllJamo()
         self.aux.writeJamoGroups()
@@ -340,7 +333,7 @@ class ListWidget(QtGui.QListWidget):
             item = self.currentItem()
             item.setData(256, self.comps)
             self.editItem(item)
-            print(item, self.comps)
+            # print(item, self.comps)
         else: 
             QtGui.QMessageBox.information(self, "알림", "선택된 자소 그룹이 없습니다.")
         self.aux.writeJamoGroups()
@@ -353,14 +346,10 @@ class ListWidget(QtGui.QListWidget):
         self.aux.writeJamoGroups()
 
     def itemNameChanged(self):
-        print(self.count)
-        for x in range(self.count) :
-            print(327, self.item(x).text(),self.item(x).data(256))
         self.aux.writeJamoGroups()
         
     def syncListSelectiontoBtn(self):
         try:
-            print(341, self.currentItem().data(256))
             self.aux.selected_jamo = list(self.currentItem().data(256))
         except AttributeError:
             self.aux.selected_jamo = []
@@ -368,21 +357,21 @@ class ListWidget(QtGui.QListWidget):
 
     def mousePressEvent(self, event):
         if event.button() == QtCore.Qt.LeftButton and self.indexAt(event.pos()).isValid():
-            print(self.indexAt(event.pos()).data(256))
+            # print(self.indexAt(event.pos()).data(256))
             curRow = self.indexAt(event.pos()).row()
             self.setCurrentRow(curRow)
             self.syncListSelectiontoBtn()
-            print(372, self.aux.selected_jamo)
+            # print(372, self.aux.selected_jamo)
         elif not self.currentRow == -1:
-            print(374, self.currentRow)
+            # print(374, self.currentRow)
             self.clearSelection()
             self.aux.updateBtnSelection()
             self.setCurrentItem(None)
             self.syncListSelectiontoBtn()
-            print(379, self.aux.selected_jamo)
+            # print(379, self.aux.selected_jamo)
         else:
             self.clearSelection()
-            print(382, self.aux.selected_jamo)
+            # print(382, self.aux.selected_jamo)
 
 
     def mouseDoubleClickEvent(self, event):
@@ -496,7 +485,7 @@ QGroupBox > QPushButton{
         for button in self.btnGrp_jamo.buttons():
             if button.isChecked():
                 self.selected_jamo.append(button.text)
-        print(456, self.selected_jamo)
+        # print(456, self.selected_jamo)
 
     def updateBtnSelection(self): #btn, state):
         buttons_to_manipulate = self.selected_jamo
@@ -505,7 +494,7 @@ QGroupBox > QPushButton{
                 button.setChecked(True)
             else: 
                 button.setChecked(False)
-        print(500, self.selected_jamo)
+        # print(500, self.selected_jamo)
 
     def reverseJamoSelection(self): #btn, state):
         self.selected_jamo = []
@@ -514,36 +503,35 @@ QGroupBox > QPushButton{
                 button.setChecked(False)
             else: 
                 button.setChecked(True)
-        print(509, self.selected_jamo)
+        # print(509, self.selected_jamo)
 
     def unselectAllJamo(self):
         self.selected_jamo = []
         for button in self.btnGrp_jamo.buttons():
             button.setChecked(False)
-        print(462, self.selected_jamo)
+        # print(462, self.selected_jamo)
 
     def selectAllJamo(self):
         self.selected_jamo = []
         for button in self.btnGrp_jamo.buttons():
             button.setChecked(True)
-        print(521, self.selected_jamo)
+        # print(521, self.selected_jamo)
 
     def writeJamoGroups(self):
         jamoGroupList = []
         for x in range(self.enlistedJamo_List.count):
             jamoGroupList.append({self.enlistedJamo_List.item(x).text():self.enlistedJamo_List.item(x).data(256)})
-        print(527, jamoGroupList)
-        print(528, JAMO_GROUP_DICT)
+        # print(527, jamoGroupList)
+        # print(528, JAMO_GROUP_DICT)
         JAMO_GROUP_DICT[JAMO_LABEL_EN[self.jamoIdx]] = jamoGroupList
         NEW_JAMO_DICT = flP.packageLib
-        NEW_JAMO_DICT["com.Minwoo.GenerateHangeulTransform"][JAMO_LABEL_EN[self.jamoIdx]] = JAMO_GROUP_DICT[JAMO_LABEL_EN[self.jamoIdx]]
+        NEW_JAMO_DICT["com.Minwoo.GenerateHangeulComposition"][JAMO_LABEL_EN[self.jamoIdx]] = JAMO_GROUP_DICT[JAMO_LABEL_EN[self.jamoIdx]]
         flP.packageLib = NEW_JAMO_DICT
-        print(533, flP.packageLib["com.Minwoo.GenerateHangeulTransform"])
+        # print(533, flP.packageLib["com.Minwoo.GenerateHangeulComposition"])
 
     def readJamoGroups(self):
         jamoGroupList = JAMO_GROUP_DICT[JAMO_LABEL_EN[self.jamoIdx]]
         for group in jamoGroupList:
-            print(group)
             item = QtGui.QListWidgetItem()
             item.setData(256, list(group.values())[0])
             item.setText(list(group.keys())[0])
