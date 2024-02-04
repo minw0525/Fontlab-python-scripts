@@ -11,10 +11,11 @@ from typerig.proxy.fl.gui.widgets import *
 from typerig.proxy.fl.gui import QtGui
 from PythonQt import QtCore
 
-app_version = '1.02'
+app_version = '1.10'
 app_name = 'Minwoo | Generate Hangeul Composition'
 qapp = QtGui.QApplication.instance()
 nt = fgNametable()
+flP = fl6.flPackage(fl6.CurrentFont())
 
 
 ################################################################################
@@ -52,6 +53,10 @@ JONG = (
     u'ㄻ', u'ㄼ', u'ㄽ', u'ㄾ', u'ㄿ', u'ㅀ', u'ㅁ', u'ㅂ', u'ㅄ', u'ㅅ',
     u'ㅆ', u'ㅇ', u'ㅈ', u'ㅊ', u'ㅋ', u'ㅌ', u'ㅍ', u'ㅎ'
 )
+JAMO_LIST = [CHO, JUNG, JONG]
+
+JAMO_LABEL_KO = [u'초성', u'중성', u'종성']
+JAMO_LABEL_EN = [u'cho', u'jung', u'jong']
 
 JAMO = CHO + JUNG + JONG[1:]
 
@@ -82,6 +87,15 @@ u"가",u"각",u"간",u"갇",u"갈",u"갉",u"갊",u"갋",u"감",u"갑",u"값",u"�
 CHAR_RANGE_LIST = [ADOBE_KR9, KSX_1001]
 CHAR_RANGE_DICT= [{string : string for string in ADOBE_KR9}, {string : string for string in KSX_1001}]
 
+try:
+    JAMO_GROUP_DICT = flP.packageLib["com.Minwoo.GenerateHangeulTransform"]
+    print(92, JAMO_GROUP_DICT)
+except KeyError :
+    NEW_JAMO_DICT = {**flP.packageLib, "com.Minwoo.GenerateHangeulTransform": {x:[] for x in JAMO_LABEL_EN}}
+    flP.packageLib = NEW_JAMO_DICT
+    JAMO_GROUP_DICT = flP.packageLib["com.Minwoo.GenerateHangeulTransform"]
+    print(94, flP.packageLib["com.Minwoo.GenerateHangeulTransform"])
+    print(96, JAMO_GROUP_DICT)
 
 ################################################################################
 # Hangeul Compositing Functions
@@ -198,15 +212,20 @@ def composeAllCases(chosung = [u''], jungsung = [u''], jongsung = [u''], jung_by
     # if SORT_ORDER == 3 : print('SORT ORDER : 종성 순')
 
     # print('초성: %s, 중성: %s, 종성: %s' %(''.join(chosung), ''.join(jungsung), ''.join(jongsung)))
-
+    print(chosung, jungsung, jongsung)
     chosung = list(CHO) if is_cho(chosung)==[] else is_cho(chosung)
+    print(chosung, type(chosung))
     chosung.sort()
+
     jungsung = list(JUNG) if is_jung(jungsung)==[] else is_jung(jungsung)
+    print(jungsung, type(jungsung))
     if jung_by_type : 
         jungsung.sort(key=lambda x : JUNG_BY_TYPE.index(x))
     else: 
         jungsung.sort()
+
     jongsung = list(JONG) if is_jong(jongsung)==[] else is_jong(jongsung)
+    print(jongsung, type(jongsung))
     jongsung.sort()
 
     composedChrList = []
@@ -249,6 +268,10 @@ def composeAllCases(chosung = [u''], jungsung = [u''], jongsung = [u''], jung_by
 
     # print(''.join(composedChrList))
     return composedChrList
+
+################################################################################
+# FL Interface
+################################################################################
 
 def setTextblock(charArr):
     symbolLists = fl6.fgSymbolList([fl6.fgSymbol(ord(chr)) for chr in charArr])   
@@ -293,47 +316,256 @@ QGroupBox {
 }
 '''
 
+class ListWidget(QtGui.QListWidget):
+    def __init__(self, aux, jamoIdx) -> None:
+        super(ListWidget, self).__init__()
+        self.aux = aux        
+        self.setAlternatingRowColors(True)
+        self.itemChanged.connect(self.itemNameChanged)
+
+    def addCompItems(self):
+        self.comps = self.aux.selected_jamo
+        item = QtGui.QListWidgetItem()
+        item.setData(256, self.comps)
+        item.setText(','.join(self.comps))
+        item.setFlags(1|2|16|32) # ItemIsSelectable | ItemIsEditable | ItemIsEnabled
+        print(320, item.data(256)) # UserRole
+        self.addItem(item)
+        self.aux.unselectAllJamo()
+        self.aux.writeJamoGroups()
+
+    def modifyCompItems(self):
+        self.comps = self.aux.selected_jamo
+        if self.comps != [] :
+            item = self.currentItem()
+            item.setData(256, self.comps)
+            self.editItem(item)
+            print(item, self.comps)
+        else: 
+            QtGui.QMessageBox.information(self, "알림", "선택된 자소 그룹이 없습니다.")
+        self.aux.writeJamoGroups()
+
+    def removeCompItems(self):
+        if self.currentItem():
+            item = self.currentItem()
+            row = self.currentRow
+            self.takeItem(row)
+        self.aux.writeJamoGroups()
+
+    def itemNameChanged(self):
+        print(self.count)
+        for x in range(self.count) :
+            print(327, self.item(x).text(),self.item(x).data(256))
+        self.aux.writeJamoGroups()
+        
+    def syncListSelectiontoBtn(self):
+        try:
+            print(341, self.currentItem().data(256))
+            self.aux.selected_jamo = list(self.currentItem().data(256))
+        except AttributeError:
+            self.aux.selected_jamo = []
+        self.aux.updateBtnSelection()
+
+    def mousePressEvent(self, event):
+        if event.button() == QtCore.Qt.LeftButton and self.indexAt(event.pos()).isValid():
+            print(self.indexAt(event.pos()).data(256))
+            curRow = self.indexAt(event.pos()).row()
+            self.setCurrentRow(curRow)
+            self.syncListSelectiontoBtn()
+            print(372, self.aux.selected_jamo)
+        elif not self.currentRow == -1:
+            print(374, self.currentRow)
+            self.clearSelection()
+            self.aux.updateBtnSelection()
+            self.setCurrentItem(None)
+            self.syncListSelectiontoBtn()
+            print(379, self.aux.selected_jamo)
+        else:
+            self.clearSelection()
+            print(382, self.aux.selected_jamo)
+
+
+    def mouseDoubleClickEvent(self, event):
+        if event.button() == QtCore.Qt.LeftButton and self.indexAt(event.pos()).isValid():
+            curRow = self.indexAt(event.pos()).row()
+            self.setCurrentRow(curRow)
+            self.editItem(self.item(curRow))
+            
+
+class JamoWidget(QtGui.QWidget):
+    def __init__(self, jamoIdx) :
+        super(JamoWidget, self).__init__()
+        self.jamoIdx = jamoIdx
+        self.selected_jamo = []
+        self.setStyleSheet(styleSheet)
+
+        # - Widgets
+        # -- Groupboxes
+        self.groupbox_jamo = QtGui.QGroupBox(JAMO_LABEL_KO[jamoIdx])
+        
+        self.btnGrp_jamo = QtGui.QButtonGroup()
+        self.btnGrp_jamo.setExclusive(False)
+
+        self.btnGrp_jamo.buttonToggled.connect(self.updateJamoSelection)
+
+        self.gridLayout_jamo = QtGui.QGridLayout()
+        self.gridLayout_jamo.setSpacing(1)
+        self.gridLayout_jamo.setVerticalSpacing(1)
+
+        self.hSpacer30 = QtGui.QSpacerItem(1, 30)
+        self.hSpacer20 = QtGui.QSpacerItem(1, 20)
+        self.hSpacer10 = QtGui.QSpacerItem(1, 10)
+
+        for idx, chr in enumerate(JAMO_LIST[jamoIdx]):
+            if jamoIdx == 2 and chr == '':
+                chr = u'·'
+            exec("""
+self.btn_jamo_{idx} = QtGui.QPushButton(chr)
+self.btn_jamo_{idx}.setCheckable(True)
+self.gridLayout_jamo.addWidget(self.btn_jamo_{idx}, idx//7, idx%7, 1, 1, QtCore.Qt.AlignTop)
+self.btnGrp_jamo.addButton(self.btn_jamo_{idx}, {idx})
+""".format(idx = idx))
+
+        self.gridLayout_jamo.addItem(self.hSpacer30, 3, 1)
+        self.groupbox_jamo.setLayout(self.gridLayout_jamo)
+
+        # -- List
+        self.enlistedJamo_List = ListWidget(self, self.jamoIdx)
+        
+        # -- Buttons
+        self.btn_selectAll_jamo = QtGui.QPushButton('전체 선택')
+        self.btn_unselectAll_jamo = QtGui.QPushButton('선택 해제')
+        self.btn_selectReverse_jamo = QtGui.QPushButton('선택 반전')
+        self.btn_enlistComp_jamo = QtGui.QPushButton('등록')
+        self.btn_modComp_jamo = QtGui.QPushButton('변경')
+        self.btn_removeComp_jamo = QtGui.QPushButton('삭제')
+
+        # -- Tooltips
+        self.btn_selectAll_jamo.setToolTip(u'전체 자소를 선택합니다.')
+        self.btn_unselectAll_jamo.setToolTip(u'자소 선택을 해제합니다.')
+        self.btn_selectReverse_jamo.setToolTip(u'자소 선택을 반전합니다.')
+        self.btn_enlistComp_jamo.setToolTip(u'현재 자소를 등록합니다.')
+        self.btn_modComp_jamo.setToolTip(u'선택한 자소를 수정합니다.')
+        self.btn_removeComp_jamo.setToolTip(u'선택한 자소를 삭제합니다.')
+
+        # -- Slots
+        self.btn_selectAll_jamo.clicked.connect(self.selectAllJamo)
+        self.btn_unselectAll_jamo.clicked.connect(self.unselectAllJamo)
+        self.btn_selectReverse_jamo.clicked.connect(self.reverseJamoSelection)
+        
+        self.btn_enlistComp_jamo.clicked.connect(self.enlistedJamo_List.addCompItems)
+        self.btn_modComp_jamo.clicked.connect(self.enlistedJamo_List.modifyCompItems)
+        self.btn_removeComp_jamo.clicked.connect(self.enlistedJamo_List.removeCompItems)
+
+        # -- Build Layout
+        self.layout_jamo = QtGui.QGridLayout()
+
+        self.layout_jamo.addWidget(self.groupbox_jamo,           0,0,1,3)
+
+        self.layout_jamo.addWidget(self.btn_selectAll_jamo,      1,0,1,1)
+        self.layout_jamo.addWidget(self.btn_unselectAll_jamo,    1,1,1,1)
+        self.layout_jamo.addWidget(self.btn_selectReverse_jamo,  1,2,1,1)
+
+        self.layout_jamo.addItem(self.hSpacer20, 2, 0)
+
+        self.layout_jamo.addWidget(self.enlistedJamo_List,       3,0,4,3)
+        self.layout_jamo.addWidget(self.btn_enlistComp_jamo,     7,0,1,1)
+        self.layout_jamo.addWidget(self.btn_modComp_jamo,        7,1,1,1)
+        self.layout_jamo.addWidget(self.btn_removeComp_jamo,     7,2,1,1)
+
+        self.layout_jamo.addItem(self.hSpacer20, 8, 0)
+        # - StyleSheet
+        jasoBtnStyleSheet ='''
+QGroupBox > QPushButton{
+    font-weight: 400;
+    font-size: 17px;
+    margin: 0;
+    width: 40px;
+    height: 30px;
+}'''
+        self.groupbox_jamo.setStyleSheet(jasoBtnStyleSheet)
+        self.layout_jamo.setSpacing(0)
+        self.layout_jamo.setVerticalSpacing(5)
+        self.setLayout(self.layout_jamo)
+
+        self.readJamoGroups()
+
+        # - Methods
+    def updateJamoSelection(self): #btn, state):
+        self.selected_jamo = []
+        for button in self.btnGrp_jamo.buttons():
+            if button.isChecked():
+                self.selected_jamo.append(button.text)
+        print(456, self.selected_jamo)
+
+    def updateBtnSelection(self): #btn, state):
+        buttons_to_manipulate = self.selected_jamo
+        for button in self.btnGrp_jamo.buttons():
+            if button.text in buttons_to_manipulate:
+                button.setChecked(True)
+            else: 
+                button.setChecked(False)
+        print(500, self.selected_jamo)
+
+    def reverseJamoSelection(self): #btn, state):
+        self.selected_jamo = []
+        for button in self.btnGrp_jamo.buttons():
+            if button.isChecked():
+                button.setChecked(False)
+            else: 
+                button.setChecked(True)
+        print(509, self.selected_jamo)
+
+    def unselectAllJamo(self):
+        self.selected_jamo = []
+        for button in self.btnGrp_jamo.buttons():
+            button.setChecked(False)
+        print(462, self.selected_jamo)
+
+    def selectAllJamo(self):
+        self.selected_jamo = []
+        for button in self.btnGrp_jamo.buttons():
+            button.setChecked(True)
+        print(521, self.selected_jamo)
+
+    def writeJamoGroups(self):
+        jamoGroupList = []
+        for x in range(self.enlistedJamo_List.count):
+            jamoGroupList.append({self.enlistedJamo_List.item(x).text():self.enlistedJamo_List.item(x).data(256)})
+        print(527, jamoGroupList)
+        print(528, JAMO_GROUP_DICT)
+        JAMO_GROUP_DICT[JAMO_LABEL_EN[self.jamoIdx]] = jamoGroupList
+        NEW_JAMO_DICT = flP.packageLib
+        NEW_JAMO_DICT["com.Minwoo.GenerateHangeulTransform"][JAMO_LABEL_EN[self.jamoIdx]] = JAMO_GROUP_DICT[JAMO_LABEL_EN[self.jamoIdx]]
+        flP.packageLib = NEW_JAMO_DICT
+        print(533, flP.packageLib["com.Minwoo.GenerateHangeulTransform"])
+
+    def readJamoGroups(self):
+        jamoGroupList = JAMO_GROUP_DICT[JAMO_LABEL_EN[self.jamoIdx]]
+        for group in jamoGroupList:
+            print(group)
+            item = QtGui.QListWidgetItem()
+            item.setData(256, list(group.values())[0])
+            item.setText(list(group.keys())[0])
+            item.setFlags(1|2|16|32) # ItemIsSelectable | ItemIsEditable | ItemIsEnabled
+            self.enlistedJamo_List.addItem(item)
+
+
 class MainWindow(QtGui.QWidget):
     # - Split/Break contour 
     def __init__(self):
         super(MainWindow, self).__init__()
 
         # - Init
-        self.selected_cho, self.selected_jung, self.selected_jong = [], [], []
         self.composedChars = []
         self.setStyleSheet(styleSheet)
 
         # - Widgets
         # -- Groupboxes
-        self.groupbox_cho = QtGui.QGroupBox(u'초성')
-        self.groupbox_jung = QtGui.QGroupBox(u'중성')
-        self.groupbox_jong = QtGui.QGroupBox(u'종성')
-
         self.groupbox_controls = QtGui.QGroupBox('')
 
-        self.btnGrp_cho = QtGui.QButtonGroup()
-        self.btnGrp_jung = QtGui.QButtonGroup()
-        self.btnGrp_jong = QtGui.QButtonGroup()
-
-        self.btnGrp_cho.setExclusive(False)
-        self.btnGrp_jung.setExclusive(False)
-        self.btnGrp_jong.setExclusive(False)
-
-        self.btnGrp_cho.buttonToggled.connect(self.updateChoSelection)
-        self.btnGrp_jung.buttonToggled.connect(self.updateJungSelection)
-        self.btnGrp_jong.buttonToggled.connect(self.updateJongSelection)
-
-        self.gridLayout_cho = QtGui.QGridLayout()
-        self.gridLayout_jung = QtGui.QGridLayout()
-        self.gridLayout_jong = QtGui.QGridLayout()
         self.gridLayout_controls = QtGui.QGridLayout()
 
-        self.gridLayout_cho.setSpacing(1)
-        self.gridLayout_cho.setVerticalSpacing(1)
-        self.gridLayout_jung.setSpacing(1)
-        self.gridLayout_jung.setVerticalSpacing(1)
-        self.gridLayout_jong.setSpacing(1)
-        self.gridLayout_jong.setVerticalSpacing(1)
         self.gridLayout_controls.setSpacing(0)
         self.gridLayout_controls.setVerticalSpacing(0)
 
@@ -341,52 +573,13 @@ class MainWindow(QtGui.QWidget):
         self.hSpacer20 = QtGui.QSpacerItem(1, 20)
         self.hSpacer10 = QtGui.QSpacerItem(1, 10)
 
-
-        for idx, chr in enumerate(CHO):
-            exec("""
-self.btn_cho_{idx} = QtGui.QPushButton(chr)
-self.btn_cho_{idx}.setCheckable(True)
-self.gridLayout_cho.addWidget(self.btn_cho_{idx}, idx//7, idx%7, 1, 1, QtCore.Qt.AlignTop)
-self.btnGrp_cho.addButton(self.btn_cho_{idx}, {idx})
-""".format(idx = idx))
-
-        for idx, chr in enumerate(JUNG):
-            exec("""
-self.btn_jung_{idx} = QtGui.QPushButton(chr)
-self.btn_jung_{idx}.setCheckable(True)
-self.gridLayout_jung.addWidget(self.btn_jung_{idx}, idx//7, idx%7, 1, 1, QtCore.Qt.AlignTop)
-self.btnGrp_jung.addButton(self.btn_jung_{idx}, {idx})
-""".format(idx = idx))
-
-        for idx, chr in enumerate(JONG):
-            if chr == '':
-                chr = u'·'
-            exec("""
-self.btn_jong_{idx} = QtGui.QPushButton(chr)
-self.btn_jong_{idx}.setCheckable(True)
-self.gridLayout_jong.addWidget(self.btn_jong_{idx}, idx//7, idx%7, 1, 1, QtCore.Qt.AlignTop)
-self.btnGrp_jong.addButton(self.btn_jong_{idx}, {idx})
-""".format(idx = idx))
-
-        self.gridLayout_cho.addItem(self.hSpacer30, 3, 1)
-        self.gridLayout_jung.addItem(self.hSpacer30, 3, 1)
-
-        self.groupbox_cho.setLayout(self.gridLayout_cho)
-        self.groupbox_jung.setLayout(self.gridLayout_jung)
-        self.groupbox_jong.setLayout(self.gridLayout_jong)
         self.groupbox_controls.setLayout(self.gridLayout_controls)
+        
+        self.ChoWidget = JamoWidget(0)
+        self.JungWidget = JamoWidget(1)
+        self.JongWidget = JamoWidget(2)
 
         # -- Buttons
-        self.btn_selectAll_cho = QtGui.QPushButton('전체 선택')
-        self.btn_unselectAll_cho = QtGui.QPushButton('선택 해제')
-        self.btn_selectReverse_cho = QtGui.QPushButton('선택 반전')
-        self.btn_selectAll_jung = QtGui.QPushButton('전체 선택')
-        self.btn_unselectAll_jung = QtGui.QPushButton('선택 해제')
-        self.btn_selectReverse_jung = QtGui.QPushButton('선택 반전')
-        self.btn_selectAll_jong = QtGui.QPushButton('전체 선택')
-        self.btn_unselectAll_jong = QtGui.QPushButton('선택 해제')
-        self.btn_selectReverse_jong = QtGui.QPushButton('선택 반전')
-
         self.btn_copy = QtGui.QPushButton(u'복사')
         self.btn_editOnCurTab = QtGui.QPushButton(u'현재 창')
         self.btn_editOnNewTab = QtGui.QPushButton(u'새 창')
@@ -412,15 +605,6 @@ self.btnGrp_jong.addButton(self.btn_jong_{idx}, {idx})
         self.chkbox_lineBreak = QtGui.QCheckBox('중성별 줄바꿈')
 
         # -- Tooltips
-        self.btn_selectAll_cho.setToolTip(u'전체 자소를 선택합니다.')
-        self.btn_unselectAll_cho.setToolTip(u'자소 선택을 해제합니다.')
-        self.btn_selectReverse_cho.setToolTip(u'자소 선택을 반전합니다.')
-        self.btn_selectAll_jung.setToolTip(u'전체 자소를 선택합니다.')
-        self.btn_unselectAll_jung.setToolTip(u'자소 선택을 해제합니다.')
-        self.btn_selectReverse_jung.setToolTip(u'자소 선택을 반전합니다.')
-        self.btn_selectAll_jong.setToolTip(u'전체 자소를 선택합니다.')
-        self.btn_unselectAll_jong.setToolTip(u'자소 선택을 해제합니다.')
-        self.btn_selectReverse_jong.setToolTip(u'자소 선택을 반전합니다.')
         self.btn_copy.setToolTip(u'클립보드에 조합된 문자열을 복사합니다.')
         self.btn_editOnCurTab.setToolTip(u'조합된 문자열을 현재 글리프 윈도우에서 편집합니다.')
         self.btn_editOnNewTab.setToolTip(u'조합된 문자열을 새 글리프 윈도우에서 편집합니다.')
@@ -432,16 +616,6 @@ self.btnGrp_jong.addButton(self.btn_jong_{idx}, {idx})
         self.comboBox_sortOrder.setToolTip(u'조합된 문자열의 정렬 순서를 선택합니다.')
 
         # -- Slots
-        self.btn_selectAll_cho.clicked.connect(self.selectAllCho)
-        self.btn_unselectAll_cho.clicked.connect(self.unselectAllCho)
-        self.btn_selectReverse_cho.clicked.connect(self.reverseChoSelection)
-        self.btn_selectAll_jung.clicked.connect(self.selectAllJung)
-        self.btn_unselectAll_jung.clicked.connect(self.unselectAllJung)
-        self.btn_selectReverse_jung.clicked.connect(self.reverseJungSelection)
-        self.btn_selectAll_jong.clicked.connect(self.selectAllJong)
-        self.btn_unselectAll_jong.clicked.connect(self.unselectAllJong)
-        self.btn_selectReverse_jong.clicked.connect(self.reverseJongSelection)
-
         self.btn_editOnCurTab.clicked.connect(self.editOnCurTab)
         self.btn_editOnNewTab.clicked.connect(self.editOnNewTab)
         self.chkbox_sortByJung.stateChanged.connect(self.sortJungByType)
@@ -460,27 +634,15 @@ self.btnGrp_jong.addButton(self.btn_jong_{idx}, {idx})
         
         # -- Build Layout
         self.layout_main = QtGui.QGridLayout()
-        self.layout_main.addWidget(self.groupbox_cho,           0,0,1,3)
-        self.layout_main.addWidget(self.groupbox_jung,          0,3,1,3)
-        self.layout_main.addWidget(self.groupbox_jong,          0,6,1,3)
+        self.layout_main.addWidget(self.ChoWidget,           0,0,8,3)
+        self.layout_main.addWidget(self.JungWidget,          0,3,8,3)
+        self.layout_main.addWidget(self.JongWidget,          0,6,8,3)
 
-        self.layout_main.addWidget(self.btn_selectAll_cho,      1,0,1,1)
-        self.layout_main.addWidget(self.btn_unselectAll_cho,    1,1,1,1)
-        self.layout_main.addWidget(self.btn_selectReverse_cho,  1,2,1,1)
-        self.layout_main.addWidget(self.btn_selectAll_jung,     1,3,1,1)
-        self.layout_main.addWidget(self.btn_unselectAll_jung,   1,4,1,1)
-        self.layout_main.addWidget(self.btn_selectReverse_jung, 1,5,1,1)
-        self.layout_main.addWidget(self.btn_selectAll_jong,     1,6,1,1)
-        self.layout_main.addWidget(self.btn_unselectAll_jong,   1,7,1,1)
-        self.layout_main.addWidget(self.btn_selectReverse_jong, 1,8,1,1)
-
-        self.layout_main.addItem(self.hSpacer20, 2, 0)
-
-        self.layout_main.addWidget(self.textEdit_output,        3,0,4,6)
-        self.layout_main.addWidget(self.chkbox_sortByJung,      7,2,1,2)
-        self.layout_main.addWidget(self.chkbox_lineBreak,       7,4,1,2)
-        self.layout_main.addWidget(self.label_strLen,           7,0,1,2)
-        self.layout_main.addWidget(self.groupbox_controls,      3,6,5,3)
+        self.layout_main.addWidget(self.textEdit_output,        9,0,4,6)
+        self.layout_main.addWidget(self.chkbox_sortByJung,      13,2,1,2)
+        self.layout_main.addWidget(self.chkbox_lineBreak,       13,4,1,2)
+        self.layout_main.addWidget(self.label_strLen,           13,0,1,2)
+        self.layout_main.addWidget(self.groupbox_controls,      9,6,5,3)
 
         self.gridLayout_controls.addWidget(self.label_charRange,        0,0,1,1)
         self.gridLayout_controls.addWidget(self.comboBox_charRange,     0,1,1,2)
@@ -498,20 +660,7 @@ self.btnGrp_jong.addButton(self.btn_jong_{idx}, {idx})
         self.layout_main.setVerticalSpacing(5)
         self.setLayout(self.layout_main)
 
-        # - Set StyleSheet
-
-        jasoBtnStyleSheet ='''
-QGroupBox > QPushButton{
-    font-weight: 400;
-    font-size: 17px;
-    margin: 0;
-    width: 40px;
-    height: 30px;
-}'''
-        self.groupbox_cho.setStyleSheet(jasoBtnStyleSheet)
-        self.groupbox_jung.setStyleSheet(jasoBtnStyleSheet)
-        self.groupbox_jong.setStyleSheet(jasoBtnStyleSheet)
-        
+        # - StyleSheet
         self.btn_compose.setStyleSheet('''
         QPushButton{
             background-color: #3585fd;
@@ -529,17 +678,17 @@ QGroupBox > QPushButton{
 
         # - Set Widget
         self.setWindowTitle('%s %s' %(app_name, app_version))
-        self.setGeometry(0, 0, 900, 300)
+        self.setGeometry(0, 0, 900, 400)
         self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint) # Always on top!!
-        self.move(qapp.desktop().availableGeometry().width() / 2 - 900 / 2, qapp.desktop().availableGeometry().height() / 2 - 500 / 2) # move window to visible desktop center
+        self.move(qapp.desktop().availableGeometry().width() / 2 - 900 / 2, qapp.desktop().availableGeometry().height() / 2 - 800 / 2) # move window to visible desktop center
         self.setMinimumSize(500,self.sizeHint.height())
 
         self.show()
 
     def refreshText(self):
-        if not self.stringExists() and is_cho(self.selected_cho)==[] and is_jung(self.selected_jung)==[] and is_jong(self.selected_jong)==[] :
+        if is_cho(self.ChoWidget.selected_jamo)==[] and is_jung(self.JungWidget.selected_jamo)==[] and is_jong(self.JongWidget.selected_jamo)==[] :
             QtGui.QMessageBox.information(self, "알림", "선택된 자소가 없습니다.")
-        self.composedChars = composeAllCases(self.selected_cho, self.selected_jung, self.selected_jong, SORT_JUNG_BY_TYPE, LINE_BREAK)
+        self.composedChars = composeAllCases(self.ChoWidget.selected_jamo, self.JungWidget.selected_jamo, self.JongWidget.selected_jamo, SORT_JUNG_BY_TYPE, LINE_BREAK)
         self.textEdit_output.setText(''.join(self.composedChars))
         self.label_strLen.setText('조합된 글자: {}자'.format(len(self.textEdit_output.toPlainText().replace('\n',''))))
 
@@ -560,87 +709,6 @@ QGroupBox > QPushButton{
         SORT_ORDER = self.comboBox_sortOrder.currentData
         if self.stringExists():
             self.refreshText()
-  
-
-    def updateChoSelection(self): #btn, state):
-        self.selected_cho = []
-        for button in self.btnGrp_cho.buttons():
-            if button.isChecked():
-                self.selected_cho.append(button.text)
-        # if state : 
-        #     self.selected_cho.append(btn.text)
-        # else :
-        #     self.selected_cho.remove(btn.text)
-        # self.selected_cho.sort() 
-
-
-    def updateJungSelection(self):
-        self.selected_jung = []
-        for button in self.btnGrp_jung.buttons():
-            if button.isChecked():
-                self.selected_jung.append(button.text)
-
-    def updateJongSelection(self):
-        self.selected_jong = []
-        for button in self.btnGrp_jong.buttons():
-            if button.isChecked():
-                self.selected_jong.append(button.text)
-
-
-    def reverseChoSelection(self): #btn, state):
-        self.selected_cho = []
-        for button in self.btnGrp_cho.buttons():
-            if button.isChecked():
-                button.setChecked(False)
-            else: 
-                button.setChecked(True)
-
-    def reverseJungSelection(self):
-        self.selected_jung = []
-        for button in self.btnGrp_jung.buttons():
-            if button.isChecked():
-                button.setChecked(False)
-            else: 
-                button.setChecked(True)                
-
-    def reverseJongSelection(self):
-        self.selected_jong = []
-        for button in self.btnGrp_jong.buttons():
-            if button.isChecked():
-                button.setChecked(False)
-            else: 
-                button.setChecked(True)
-
-
-    def unselectAllCho(self):
-        self.selected_cho = []
-        for button in self.btnGrp_cho.buttons():
-            button.setChecked(False)
-
-    def unselectAllJung(self):
-        self.selected_jung = []
-        for button in self.btnGrp_jung.buttons():
-            button.setChecked(False)
-
-    def unselectAllJong(self):
-        self.selected_jong = []
-        for button in self.btnGrp_jong.buttons():
-            button.setChecked(False)
-
-    def selectAllCho(self):
-        self.selected_cho = []
-        for button in self.btnGrp_cho.buttons():
-            button.setChecked(True)
-
-    def selectAllJung(self):
-        self.selected_jung = []
-        for button in self.btnGrp_jung.buttons():
-            button.setChecked(True)
-
-    def selectAllJong(self):
-        self.selected_jong = []
-        for button in self.btnGrp_jong.buttons():
-            button.setChecked(True)
 
     def editOnNewTab(self):
         if self.stringExists():
