@@ -1,105 +1,46 @@
-# Fontlab-python-scripts
-Python scripts for Fontlab 7 and 8.
+# Fontlab Python Scripts
 
----
 
-## Projective Transform
-![](./img/projective_transform.png)
+## FL8 Scripts
 
-사각형 글리프 공간의 변의 길이를 조정하여 글리프를 원근 변환합니다.
+*   **`Adhesiontext Korean/adhesiontext Korean for Fontlab.py`**
+    *   선택한 한글 음절, 혹은 선택한 범위 내의 한글 음절을 조합하여 랜덤한 한국어 단어 목록을 생성합니다.
+    *   Generates a list of random Korean words by combining selected Hangul syllables or syllables within a selected range.
 
-Transform glyphs by adjusting the length of the sides of a rectangular glyph space.
+*   **`Check Negative Side-bearing.py`**
+    *   음수 사이드 베어링이 있는 글리프를 확인하고 플래그를 지정합니다. 
+    *   Checks for glyphs with negative side-bearings and flags them.
 
----
+*   **`Check_Hangeul_Module.py`**
+    *   현재 편집 중인 문자열의 초성과 종성을 선택한 자소로 치환해 한글 모듈을 확인합니다. 
+    *   Checks Hangul modules by substituting the initial (Choseong) and final (Jongseong) consonants of the current string with selected ones.
 
-## Generate Hangeul Composition 
-Hangeul composition code forked from Hangulpy
+*   **`Edit Component Sources.py`**
+    *   현재 편집 창의 글리프들을 구성하는 모든 컴포넌트를 새 창에 나열합니다. 
+    *   Lists all components that make up the glyphs in the current editing window in a new window.
 
-https://github.com/rhobot/Hangulpy
+*   **`Flag Glyphs.py`**
+    *   선택된 글리프에 플래그를 일괄적으로 지정합니다.
+    *   Applies a flag to all selected glyphs.
 
-![](./img/Generate_Hangeul_Composition.png)
+*   **`Generate_Hangeul_Composition.py`**
+    *   선택한 초성, 중성, 종성을 조합해 한글 문자열을 생성합니다. 
+    *   Generates Hangul strings by combining selected initial, medial, and final consonants (Choseong, Jungseong, Jongseong).
 
-선택된 자소를 조합해 한글 문자열을 생성합니다.
+*   **`Jitter Glyphs.py`**
+    *   선택한 글리프의 윤곽선을 무작위로 이동시켜 지터 효과를 생성합니다.
+    *   Creates a jitter effect by randomly moving the points on the outlines of selected glyphs.
 
-Generate Hangeul composition with selected graphemes.
+*   **`Projective_Transform.py`**
+    *   선택한 글리프 목록에 원근 변환을 적용합니다.
+    *   Applies a projective transformation to the selected glyphs.
 
----
+*   **`Reset_Component_layer.py`**
+    *   컴포넌트 레이어를 재설정합니다.
+    *   Resets the component layer.
 
-## Colorize Glyphs 
+*   **`Wiggle Glyphs.py`**
+    *   선택한 글리프의 윤곽선을 조작하여 글리프에 위글 효과를 추가합니다.
+    *   Adds a wiggle effect to glyphs by manipulating the points on their outlines.
 
-![](./img/Colorize_Glyphs.png)
 
-선택한 글리프들에 컬러 플래그를 일괄 적용합니다. 
-
-Batch apply color flags to selected glyphs.
-
----
-
-## Toolbox Utilities
-
-![](./img/Toolbox_Utilities_1.png)
-
-컨투어 툴의 툴박스에 액션을 추가합니다.
-
-Add actions to the Contour Tool's toolbox.  
-<br><br>
-
-> ### Set X Distance (Shift + x)
-> <img src="./img/Toolbox_Utilities_2.png" width="300"/>
-> 
-> Before|After
-> ---|---
-> ![](./img/Toolbox_Utilities_2-1.png)|![](./img/Toolbox_Utilities_2-2.png)
-> 
-> 선택한 중복 노드 사이의 X축 방향 거리를 설정합니다.
-> 
-> Set the x-axis distance between the selected duplicate nodes.
-> <br><br>
-> 
-> ### Set Y Distance (Shift + y)
-> <img src="./img/Toolbox_Utilities_3.png" width="300"/>
-> 
-> Before|After
-> ---|---
-> ![](./img/Toolbox_Utilities_4-1.png)|![](./img/Toolbox_Utilities_3-2.png)
-> 
-> 선택한 중복 노드 사이의 Y축 방향 거리를 설정합니다.
-> 
-> Set the y-axis distance between the selected duplicate nodes.
-> <br><br>
-> 
-> 
-> ###  Duplicate Nodes (Ctrl + Alt + D)
-> <img src="./img/Toolbox_Utilities_4.png" width="300"/>
-> 
-> Before|After
-> ---|---
-> ![](./img/Toolbox_Utilities_4-1.png)|![](./img/Toolbox_Utilities_4-2.png)
-> 
-> 선택한 노드를 복제합니다.
-> 
-> Duplicate selected nodes.
-> <br><br>
-> 
-> ###  Select Entire Contour (`)
-> <img src="./img/Toolbox_Utilities_5.png" width="300"/>
->
-> Before|After
-> ---|---
-> ![](./img/Toolbox_Utilities_5-1.png)|![](./img/Toolbox_Utilities_5-2.png)
-> 
-> 선택한 노드 또는 핸들이 속한 전체 컨투어를 선택합니다.
-> 
-> Select Entire Contour to Which Selected Nodes or Handles Belong.
-> <br><br>
-> 
-> ###  Form Symmetrical Circle (Shift + o)
-> <img src="./img/Toolbox_Utilities_6.png" width="300"/>
-> 
-> Before|After
-> ---|---
-> ![](./img/Toolbox_Utilities_6-1.png)|![](./img/Toolbox_Utilities_6-2.png)
-> 
-> 노드를 복사하고 뒤집어 붙여넣어 대칭 원을 만듭니다.
-> 
-> Copy, Flip, Paste Nodes to Form a Symmetrical Circle.  

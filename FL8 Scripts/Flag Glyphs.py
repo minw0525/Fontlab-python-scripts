@@ -1,4 +1,4 @@
-#FLM: MW: Colorize Glyphs
+#FLM: MW: Flag Glyphs
 
 import fontlab as fl6
 import fontgate as fgt
@@ -22,7 +22,7 @@ nT = fgt.fgNametable()
 
 
 # init ====
-app_name, app_version = 'Minwoo | Colorize Glyphs', '1.0'
+app_name, app_version = 'Minwoo | Flag Glyphs', '1.0'
 
 # Config ====
 column_names = ['Index', 'Character', 'Name', 'Unicode', 'Tags']
@@ -326,10 +326,10 @@ class MainWindow(QtGui.QWidget):
             i.setMark(self.cmb_select_color.currentData)
 
             if len(data) == 1:
-                i.updateObject(i.fl, '%s Colorized' %i.name)
+                i.updateObject(i.fl, '%s Flagged' %i.name)
 
         if len(data) > 1:
-            font.updateObject(font.fl,'%s Glyphs Colorized' %len(data))	
+            font.updateObject(font.fl,'%s Glyphs Flagged' %len(data))	
                 
         print('=== Process Completed ===')
 
