@@ -1,3 +1,5 @@
+#FLM: MW: Reset Component Layer
+
 import fontlab as fl6
 import fontgate as fgt
 
