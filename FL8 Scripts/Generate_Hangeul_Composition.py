@@ -543,8 +543,8 @@ QGroupBox > QPushButton{
         stored = flP.packageLib.get(JAMO_LIB_KEY, {})
         groups = stored.get(JAMO_LABEL_EN[self.jamoIdx], []) if isinstance(stored, dict) else []
         cleanGroups = validatedJamoGroups(groups, self.jamoIdx)
-        if not isinstance(stored, dict) or cleanGroups != groups:
-            print('잘못된 {} 그룹 데이터는 건너뜁니다. 원본 lib는 유지합니다.'.format(JAMO_LABEL_KO[self.jamoIdx]))
+        # if not isinstance(stored, dict) or cleanGroups != groups:
+        #     print('잘못된 {} 그룹 데이터는 건너뜁니다. 원본 lib는 유지합니다.'.format(JAMO_LABEL_KO[self.jamoIdx]))
         # Loading must not trigger a save of a partially populated list.
         previous = self.enlistedJamo_List.blockSignals(True)
         try:
