@@ -2,9 +2,9 @@
 
 FontLab 8 내장 Python/PythonQt에서 실행하는 선택형 스크립트 매니저입니다. 고정 저장소 `minw0525/Fontlab-python-scripts`의 공개 매니페스트를 읽고, 선택한 패키지만 고정 커밋에서 다운로드합니다.
 
-**현재 상태: 로컬 구현 및 제한된 macOS 검증 완료, 공개 배포 전.** `MW_install.vfpy`는 생성되어 있지만, 원격 저장소에 매니저 코드와 실제 배포용 `manifest.json`을 게시하기 전에는 온라인 최초 설치가 완료되지 않습니다. 현재 테스트한 FontLab 8.4.2에는 내장 SSL 로딩 오류도 있습니다. 상세한 검증 범위는 [검증 보고서](IMPLEMENTATION_STATUS.md)를 참고하세요.
+**현재 상태: 0.1.0 미리보기 코드와 실제 배포 카탈로그 게시 완료.** 매니저 코드는 고정 커밋 `2ff62a02c2c66f3a8f352007d21c47da26a13210`에서 다운로드합니다. 현재 테스트한 FontLab 8.4.2에는 내장 SSL 로딩 오류가 있어 해당 환경의 온라인 설치는 여전히 차단됩니다. 상세한 검증 범위는 [검증 보고서](IMPLEMENTATION_STATUS.md)를 참고하세요.
 
-## 사용자 사용법 (배포 이후)
+## 사용자 사용법
 
 1. 공개 저장소에서 `MW_install.vfpy`를 다운로드합니다.
 2. FontLab에서 파일을 열거나 FontLab 창으로 드래그합니다.
@@ -37,7 +37,7 @@ FontLab 8 내장 Python/PythonQt에서 실행하는 선택형 스크립트 매�
 
 1. 이 프로젝트의 `manager/`, `MW_install.vfpy`, `tools/`, `release-scripts.json`을 지정된 공개 저장소에 추가합니다. 기존 `FL8 Scripts/` 소스를 덮어쓰지 않습니다.
 2. 런타임을 수정한 경우 `python3 tools/build_installer.py`로 설치기를 재생성합니다.
-3. 테스트를 실행하고 코드를 공개 저장소에 커밋·푸시합니다. 이 작업은 이번 구현에서 수행하지 않았습니다.
+3. 테스트를 실행하고 코드를 공개 저장소에 커밋·푸시합니다. 최초 0.1.0 코드 및 카탈로그는 게시되어 있습니다. 이후 릴리스에도 같은 순서를 따릅니다.
 4. 공개된 코드의 전체 40자리 커밋 SHA를 사용해 다음 명령을 실행합니다.
 
 ```sh
@@ -46,10 +46,12 @@ python3 tools/build_manifest.py --manager-ref FULL_40_CHARACTER_COMMIT_SHA
 
 기본 스크립트 커밋은 조사한 `e38bd24e6d7bc57c0f383fd48570d5c6de7285c2`입니다. 스크립트를 갱신할 때는 `release-scripts.json`에서 해당 패키지 버전을 올린 뒤 `--scripts-ref`에 새로운 공개 커밋을 지정합니다. 매니저 버전은 `--manager-version`으로 지정합니다. `--source-root`는 로컬 원본 스냅샷과 원격 파일의 바이트 일치까지 확인할 때 사용합니다.
 
+macOS의 개발용 Python에서 CA 경로 누락 오류가 발생하면 기존 시스템 CA를 명시할 수 있습니다. `SSL_CERT_FILE=/etc/ssl/cert.pem python3 tools/build_manifest.py --manager-ref FULL_40_CHARACTER_COMMIT_SHA`로 실행하며 인증서 검증은 유지합니다. 이는 FontLab 내부의 `_ssl` 라이브러리 누락과는 다른 문제입니다.
+
 생성기는 코드와 자산을 고정 커밋에서 개별 다운로드하고 실제 SHA-256을 계산합니다. 매니저의 로컬 코드와 원격 코드가 다르거나 404가 발생하면 출력을 만들지 않습니다. 동일 ID/버전의 파일 내용 변경은 설치 시에도 거부합니다.
 
 5. 생성한 **루트 `manifest.json`만 후속 커밋으로 게시**합니다. 가짜 커밋 SHA가 들어간 배포용 매니페스트는 제공하지 않습니다.
-6. SSL이 동작하는 macOS 및 Windows FontLab에서 최초 설치와 PRD 수용 테스트를 수행한 후 배포합니다.
+6. SSL이 동작하는 macOS 및 Windows FontLab에서 최초 설치와 PRD 수용 테스트를 수행한 후 정식 출시합니다. 현재는 미리보기 배포입니다.
 
 ## 테스트
 

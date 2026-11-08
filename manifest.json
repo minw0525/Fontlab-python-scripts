@@ -1,0 +1,287 @@
+{
+  "schema_version": 1,
+  "repository": "minw0525/Fontlab-python-scripts",
+  "manager": {
+    "version": "0.1.0",
+    "source_ref": "2ff62a02c2c66f3a8f352007d21c47da26a13210",
+    "files": [
+      {
+        "source": "manager/main.py",
+        "target": "main.py",
+        "sha256": "ac500bf1d08bbf7b6ccc2eabaf0a8de4a378ef9b012e07b2a5616f247185fb4f"
+      },
+      {
+        "source": "manager/mwsm_core.py",
+        "target": "mwsm_core.py",
+        "sha256": "6ca60b5129cd656eea30aac1a3a37031935ef4d819688dd94f573ef9ced0a63c"
+      },
+      {
+        "source": "manager/mwsm_host.py",
+        "target": "mwsm_host.py",
+        "sha256": "f003af4e9e73780f2b74154d693298874ce49dd8c10c2621158320b982c38d57"
+      },
+      {
+        "source": "manager/mwsm_ui.py",
+        "target": "mwsm_ui.py",
+        "sha256": "b606d9f482251a628f3c698fdc90ab5f4ba5e89b0f190c739afb225cca18db7a"
+      }
+    ]
+  },
+  "scripts": [
+    {
+      "id": "adhesiontext-korean",
+      "name": "Adhesiontext Korean",
+      "description": "선택한 한글 음절로 구성할 수 있는 사전 단어 생성",
+      "version": "1.0.0",
+      "recommended_fontlab": "8.2+",
+      "target_python": "3.11",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
+      "requirements": [
+        "TypeRig"
+      ],
+      "entrypoint": "Adhesiontext Korean.py",
+      "source_ref": "e38bd24e6d7bc57c0f383fd48570d5c6de7285c2",
+      "files": [
+        {
+          "source": "FL8 Scripts/Adhesiontext Korean.py",
+          "target": "Adhesiontext Korean.py",
+          "sha256": "3342500af69cb5951d7e58c37a7b658ba74b1d07e7c2544bf1a59f12885610cd"
+        },
+        {
+          "source": "FL8 Scripts/adhesiontext_korean/Korean Dictionary.txt",
+          "target": "adhesiontext_korean/Korean Dictionary.txt",
+          "sha256": "01d0e055b6aff49827e1c892131b35e458a7d4a1d3d559a9f1f2e4fc62f3c68b"
+        },
+        {
+          "source": "FL8 Scripts/adhesiontext_korean/__init__.py",
+          "target": "adhesiontext_korean/__init__.py",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "source": "FL8 Scripts/adhesiontext_korean/app.py",
+          "target": "adhesiontext_korean/app.py",
+          "sha256": "c56a9799fc5a52f19a9f019c11ae4b560b99817823e2e66c78ea8133a1d76cf8"
+        }
+      ]
+    },
+    {
+      "id": "check-negative-side-bearing",
+      "name": "Check Negative Side-bearing",
+      "description": "음수 사이드베어링을 가진 글리프 확인",
+      "version": "1.0.0",
+      "recommended_fontlab": "8.2+",
+      "target_python": "3.11",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
+      "requirements": [
+        "TypeRig"
+      ],
+      "entrypoint": "Check Negative Side-bearing.py",
+      "source_ref": "e38bd24e6d7bc57c0f383fd48570d5c6de7285c2",
+      "files": [
+        {
+          "source": "FL8 Scripts/Check Negative Side-bearing.py",
+          "target": "Check Negative Side-bearing.py",
+          "sha256": "c330a2ef3bd347714b1fe8a13298cfd1225b89cef671e9a260c6d356ae53a903"
+        }
+      ]
+    },
+    {
+      "id": "check-hangeul-module",
+      "name": "Check Hangeul Module",
+      "description": "편집 문자열의 초성·종성을 치환해 한글 모듈 확인",
+      "version": "1.0.0",
+      "recommended_fontlab": "8.2+",
+      "target_python": "3.11",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
+      "requirements": [
+        "TypeRig"
+      ],
+      "entrypoint": "Check_Hangeul_Module.py",
+      "source_ref": "e38bd24e6d7bc57c0f383fd48570d5c6de7285c2",
+      "files": [
+        {
+          "source": "FL8 Scripts/Check_Hangeul_Module.py",
+          "target": "Check_Hangeul_Module.py",
+          "sha256": "d84114df81bb814cc06f9f50472f298f858e08e52511f806b62d63d6357a8ada"
+        }
+      ]
+    },
+    {
+      "id": "edit-component-sources",
+      "name": "Edit Component Sources",
+      "description": "선택 글리프의 컴포넌트 소스를 새 창에 나열",
+      "version": "1.0.0",
+      "recommended_fontlab": "8.2+",
+      "target_python": "3.11",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
+      "requirements": [
+        "TypeRig"
+      ],
+      "entrypoint": "Edit Component Sources.py",
+      "source_ref": "e38bd24e6d7bc57c0f383fd48570d5c6de7285c2",
+      "files": [
+        {
+          "source": "FL8 Scripts/Edit Component Sources.py",
+          "target": "Edit Component Sources.py",
+          "sha256": "2487b1bd8f635b364805e35b3dd584eb6b72a3f1d1204b6983ce0b616b0db490"
+        }
+      ]
+    },
+    {
+      "id": "flag-glyphs",
+      "name": "Flag Glyphs",
+      "description": "선택한 글리프의 플래그 일괄 지정",
+      "version": "1.0.0",
+      "recommended_fontlab": "8.2+",
+      "target_python": "3.11",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
+      "requirements": [
+        "TypeRig"
+      ],
+      "entrypoint": "Flag Glyphs.py",
+      "source_ref": "e38bd24e6d7bc57c0f383fd48570d5c6de7285c2",
+      "files": [
+        {
+          "source": "FL8 Scripts/Flag Glyphs.py",
+          "target": "Flag Glyphs.py",
+          "sha256": "b97f1788faa549d5fd3bb12c8c43f8d71439d988f6f8da9d34ce809078e5f38d"
+        }
+      ]
+    },
+    {
+      "id": "generate-hangeul-composition",
+      "name": "Generate Hangeul Composition",
+      "description": "선택한 초성·중성·종성을 조합해 한글 문자열 생성",
+      "version": "1.0.0",
+      "recommended_fontlab": "8.2+",
+      "target_python": "3.11",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
+      "requirements": [
+        "TypeRig"
+      ],
+      "entrypoint": "Generate_Hangeul_Composition.py",
+      "source_ref": "e38bd24e6d7bc57c0f383fd48570d5c6de7285c2",
+      "files": [
+        {
+          "source": "FL8 Scripts/Generate_Hangeul_Composition.py",
+          "target": "Generate_Hangeul_Composition.py",
+          "sha256": "d14dc13e6382790efaf0cf2eec1beb9b8bb72be04574e603a6c855ea983a0bc9"
+        }
+      ]
+    },
+    {
+      "id": "jitter-glyphs",
+      "name": "Jitter Glyphs",
+      "description": "글리프 노드에 무작위 변형 적용",
+      "version": "1.0.0",
+      "recommended_fontlab": "8.2+",
+      "target_python": "3.11",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
+      "requirements": [
+        "TypeRig"
+      ],
+      "entrypoint": "Jitter Glyphs.py",
+      "source_ref": "e38bd24e6d7bc57c0f383fd48570d5c6de7285c2",
+      "files": [
+        {
+          "source": "FL8 Scripts/Jitter Glyphs.py",
+          "target": "Jitter Glyphs.py",
+          "sha256": "ecf10068af8a63219cf89b8abd66b39a5333a2102536ceffe49b4a589f720a57"
+        }
+      ]
+    },
+    {
+      "id": "projective-transform",
+      "name": "Projective Transform",
+      "description": "글리프에 원근 변형 적용",
+      "version": "1.0.0",
+      "recommended_fontlab": "8.2+",
+      "target_python": "3.11",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
+      "requirements": [
+        "TypeRig"
+      ],
+      "entrypoint": "Projective_Transform.py",
+      "source_ref": "e38bd24e6d7bc57c0f383fd48570d5c6de7285c2",
+      "files": [
+        {
+          "source": "FL8 Scripts/Projective_Transform.py",
+          "target": "Projective_Transform.py",
+          "sha256": "d6320d1933ea7635da35a220d97b160f682e3c4f540f94ca4c8d9133274c5b88"
+        }
+      ]
+    },
+    {
+      "id": "reset-component-layer",
+      "name": "Reset Component layer",
+      "description": "컴포넌트 레이어 재설정",
+      "version": "1.0.0",
+      "recommended_fontlab": "8.2+",
+      "target_python": "3.11",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
+      "requirements": [
+        "TypeRig"
+      ],
+      "entrypoint": "Reset_Component_layer.py",
+      "source_ref": "e38bd24e6d7bc57c0f383fd48570d5c6de7285c2",
+      "files": [
+        {
+          "source": "FL8 Scripts/Reset_Component_layer.py",
+          "target": "Reset_Component_layer.py",
+          "sha256": "896d33e18b59b2bc42cdd58a10291307fb41d0931359c2555351cd6750bbe414"
+        }
+      ]
+    },
+    {
+      "id": "wiggle-glyphs",
+      "name": "Wiggle Glyphs",
+      "description": "글리프 형태에 흔들림 변형 적용",
+      "version": "1.0.0",
+      "recommended_fontlab": "8.2+",
+      "target_python": "3.11",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
+      "requirements": [
+        "TypeRig"
+      ],
+      "entrypoint": "Wiggle Glyphs.py",
+      "source_ref": "e38bd24e6d7bc57c0f383fd48570d5c6de7285c2",
+      "files": [
+        {
+          "source": "FL8 Scripts/Wiggle Glyphs.py",
+          "target": "Wiggle Glyphs.py",
+          "sha256": "45ddc9467658c20fae74a40c4c0238947e41f002df723fd949c4fb8bbae82bfc"
+        }
+      ]
+    }
+  ]
+}
