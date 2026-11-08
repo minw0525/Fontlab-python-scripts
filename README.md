@@ -1,6 +1,17 @@
 # Fontlab Python Scripts
 
 
+## MW Script Manager (미리보기)
+
+[MW_install.vfpy 다운로드](https://raw.githubusercontent.com/minw0525/Fontlab-python-scripts/main/MW_install.vfpy)
+
+FontLab에서 설치기를 열거나 창에 드래그하면 매니저를 설치합니다. 원하는 스크립트만 선택해 설치·업데이트·제거할 수 있습니다. 매니저 자체에는 TypeRig이 필요하지 않으며, 현재 제공되는 개별 스크립트에는 TypeRig이 필요합니다.
+
+**검증 중인 초기 버전입니다.** 현재 macOS FontLab 8.4.2에서 내장 SSL 라이브러리 로딩 오류를 확인했습니다. 이 환경에서는 온라인 설치가 중단됩니다. Windows 및 FontLab 8.2 실기기 검증도 남아 있습니다.
+
+- [사용법 및 개발자 배포 절차](Documentation/MW_SCRIPT_MANAGER.md)
+- [구현·검증 결과와 알려진 제한](Documentation/IMPLEMENTATION_STATUS.md)
+
 ## FL8 Scripts
 
 *   **`Adhesiontext Korean/adhesiontext Korean for Fontlab.py`**

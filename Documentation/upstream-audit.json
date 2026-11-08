@@ -1,0 +1,232 @@
+{
+  "repository": "minw0525/Fontlab-python-scripts",
+  "source_ref": "e38bd24e6d7bc57c0f383fd48570d5c6de7285c2",
+  "packages": [
+    {
+      "id": "adhesiontext-korean",
+      "imports": [
+        "FL",
+        "PythonQt",
+        "adhesiontext_korean",
+        "fontlab",
+        "os",
+        "random",
+        "string",
+        "sys",
+        "typerig.proxy.fl.gui",
+        "typerig.proxy.fl.gui.widgets",
+        "typerig.proxy.fl.objects.font"
+      ],
+      "files": [
+        {
+          "path": "FL8 Scripts/Adhesiontext Korean.py",
+          "size": 246,
+          "sha256": "3342500af69cb5951d7e58c37a7b658ba74b1d07e7c2544bf1a59f12885610cd"
+        },
+        {
+          "path": "FL8 Scripts/adhesiontext_korean/Korean Dictionary.txt",
+          "size": 5154051,
+          "sha256": "01d0e055b6aff49827e1c892131b35e458a7d4a1d3d559a9f1f2e4fc62f3c68b"
+        },
+        {
+          "path": "FL8 Scripts/adhesiontext_korean/__init__.py",
+          "size": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "FL8 Scripts/adhesiontext_korean/app.py",
+          "size": 56228,
+          "sha256": "c56a9799fc5a52f19a9f019c11ae4b560b99817823e2e66c78ea8133a1d76cf8"
+        }
+      ]
+    },
+    {
+      "id": "check-negative-side-bearing",
+      "imports": [
+        "FL",
+        "fontgate",
+        "fontlab",
+        "typerig.proxy.fl.objects.font"
+      ],
+      "files": [
+        {
+          "path": "FL8 Scripts/Check Negative Side-bearing.py",
+          "size": 758,
+          "sha256": "c330a2ef3bd347714b1fe8a13298cfd1225b89cef671e9a260c6d356ae53a903"
+        }
+      ]
+    },
+    {
+      "id": "check-hangeul-module",
+      "imports": [
+        "FL",
+        "PythonQt",
+        "fontgate",
+        "fontlab",
+        "string",
+        "typerig.proxy.fl.application.app",
+        "typerig.proxy.fl.gui",
+        "typerig.proxy.fl.gui.widgets",
+        "typerig.proxy.fl.objects.font"
+      ],
+      "files": [
+        {
+          "path": "FL8 Scripts/Check_Hangeul_Module.py",
+          "size": 54772,
+          "sha256": "d84114df81bb814cc06f9f50472f298f858e08e52511f806b62d63d6357a8ada"
+        }
+      ]
+    },
+    {
+      "id": "edit-component-sources",
+      "imports": [
+        "FL",
+        "fontgate",
+        "fontlab",
+        "typerig.proxy.fl.gui.widgets",
+        "typerig.proxy.fl.objects.font"
+      ],
+      "files": [
+        {
+          "path": "FL8 Scripts/Edit Component Sources.py",
+          "size": 1090,
+          "sha256": "2487b1bd8f635b364805e35b3dd584eb6b72a3f1d1204b6983ce0b616b0db490"
+        }
+      ]
+    },
+    {
+      "id": "flag-glyphs",
+      "imports": [
+        "PythonQt",
+        "fontgate",
+        "fontlab",
+        "typerig.proxy.fl.application.app",
+        "typerig.proxy.fl.gui",
+        "typerig.proxy.fl.gui.widgets",
+        "typerig.proxy.fl.objects.font",
+        "typerig.proxy.fl.objects.glyph",
+        "typerig.proxy.fl.objects.node"
+      ],
+      "files": [
+        {
+          "path": "FL8 Scripts/Flag Glyphs.py",
+          "size": 9830,
+          "sha256": "b97f1788faa549d5fd3bb12c8c43f8d71439d988f6f8da9d34ce809078e5f38d"
+        }
+      ]
+    },
+    {
+      "id": "generate-hangeul-composition",
+      "imports": [
+        "FL",
+        "PythonQt",
+        "fontgate",
+        "fontlab",
+        "itertools",
+        "re",
+        "string",
+        "typerig.proxy.fl.gui",
+        "typerig.proxy.fl.gui.widgets",
+        "typerig.proxy.fl.objects.font"
+      ],
+      "files": [
+        {
+          "path": "FL8 Scripts/Generate_Hangeul_Composition.py",
+          "size": 66930,
+          "sha256": "d14dc13e6382790efaf0cf2eec1beb9b8bb72be04574e603a6c855ea983a0bc9"
+        }
+      ]
+    },
+    {
+      "id": "jitter-glyphs",
+      "imports": [
+        "PythonQt",
+        "fontgate",
+        "fontlab",
+        "math",
+        "random",
+        "typerig.proxy.fl.application.app",
+        "typerig.proxy.fl.gui",
+        "typerig.proxy.fl.gui.widgets",
+        "typerig.proxy.fl.objects.font",
+        "typerig.proxy.fl.objects.glyph",
+        "typerig.proxy.fl.objects.node",
+        "warnings"
+      ],
+      "files": [
+        {
+          "path": "FL8 Scripts/Jitter Glyphs.py",
+          "size": 36609,
+          "sha256": "ecf10068af8a63219cf89b8abd66b39a5333a2102536ceffe49b4a589f720a57"
+        }
+      ]
+    },
+    {
+      "id": "projective-transform",
+      "imports": [
+        "PythonQt",
+        "fontgate",
+        "fontlab",
+        "typerig.proxy.fl.application.app",
+        "typerig.proxy.fl.gui",
+        "typerig.proxy.fl.gui.widgets",
+        "typerig.proxy.fl.objects.font",
+        "typerig.proxy.fl.objects.glyph",
+        "typerig.proxy.fl.objects.node"
+      ],
+      "files": [
+        {
+          "path": "FL8 Scripts/Projective_Transform.py",
+          "size": 28134,
+          "sha256": "d6320d1933ea7635da35a220d97b160f682e3c4f540f94ca4c8d9133274c5b88"
+        }
+      ]
+    },
+    {
+      "id": "reset-component-layer",
+      "imports": [
+        "PythonQt",
+        "fontgate",
+        "fontlab",
+        "typerig.proxy.fl.application.app",
+        "typerig.proxy.fl.gui",
+        "typerig.proxy.fl.gui.widgets",
+        "typerig.proxy.fl.objects.contour",
+        "typerig.proxy.fl.objects.font",
+        "typerig.proxy.fl.objects.glyph",
+        "typerig.proxy.fl.objects.node"
+      ],
+      "files": [
+        {
+          "path": "FL8 Scripts/Reset_Component_layer.py",
+          "size": 797,
+          "sha256": "896d33e18b59b2bc42cdd58a10291307fb41d0931359c2555351cd6750bbe414"
+        }
+      ]
+    },
+    {
+      "id": "wiggle-glyphs",
+      "imports": [
+        "PythonQt",
+        "fontgate",
+        "fontlab",
+        "math",
+        "random",
+        "typerig.proxy.fl.application.app",
+        "typerig.proxy.fl.gui",
+        "typerig.proxy.fl.gui.widgets",
+        "typerig.proxy.fl.objects.font",
+        "typerig.proxy.fl.objects.glyph",
+        "typerig.proxy.fl.objects.node",
+        "warnings"
+      ],
+      "files": [
+        {
+          "path": "FL8 Scripts/Wiggle Glyphs.py",
+          "size": 43992,
+          "sha256": "45ddc9467658c20fae74a40c4c0238947e41f002df723fd949c4fb8bbae82bfc"
+        }
+      ]
+    }
+  ]
+}

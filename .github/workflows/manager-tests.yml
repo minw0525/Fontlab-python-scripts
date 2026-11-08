@@ -1,0 +1,21 @@
+name: Script Manager tests
+on:
+  push:
+    paths: ['manager/**', 'tools/**', 'tests/**', 'MW_install.vfpy', '.github/workflows/manager-tests.yml']
+  pull_request:
+    paths: ['manager/**', 'tools/**', 'tests/**', 'MW_install.vfpy', '.github/workflows/manager-tests.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ['3.10', '3.11']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m unittest discover -s tests -v
