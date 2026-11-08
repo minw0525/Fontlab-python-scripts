@@ -1,9 +1,8 @@
-#FLM: MW: Adhesiontext Hangeul for Fontlab
+# Implementation loaded by the launcher in the parent folder.
 
-import codecs, string, os, random
+import string, os, random
 
 import FL as legacy
-from fontgate import fgNametable
 import fontlab as fl6
 from typerig.proxy.fl.objects.font import pFont
 
@@ -13,15 +12,33 @@ from typerig.proxy.fl.gui.widgets import getProcessGlyphs
 
 from PythonQt import QtCore
 
-app_version = '1.00'
+app_version = '1.01'
 app_name = 'Minwoo | adhesiontext Hangeul for Fontlab'
 qapp = QtGui.QApplication.instance()
-flP = fl6.flPackage(fl6.CurrentFont())
-nT = fgNametable()
+flP = None
 EXTENSION_KEY = "com.Minwoo.adhesiontextForFontlab"
 
 theScriptLoc = os.path.dirname(os.path.abspath(__file__))
 dicFileLocation = os.path.join(theScriptLoc, 'Korean Dictionary.txt')
+
+_dictionary_words = None
+_last_characters = None
+_last_matching_words = ()
+
+
+def matchingWords(characters):
+    global _dictionary_words, _last_characters, _last_matching_words
+    allowed = frozenset(characters)
+    if not allowed:
+        return ()
+    if _dictionary_words is None:
+        with open(dicFileLocation, encoding='utf-8') as source:
+            _dictionary_words = tuple(word for word in source.read().splitlines() if word)
+    if allowed != _last_characters:
+        _last_matching_words = tuple(word for word in _dictionary_words if set(word).issubset(allowed))
+        _last_characters = allowed
+    return _last_matching_words
+
 
 scriptsNameList = "Hangul"
 
@@ -382,8 +399,11 @@ QLabel, QComboBox, QLineEdit{
 
     def buttonCallback(self):
         if self.presetTextComboBoxWidget.currentIndex == 0:
-            self.selectedGlyphs = [self.pFont.glyph(nT.name(ord(char))) for char in self.chars.text[0:]]
             self.charstring = self.chars.text
+            if any(not char.isspace() and not FIRST_HANGUL_UNICODE <= ord(char) <= LAST_HANGUL_UNICODE
+                   for char in self.charstring):
+                print('완성형 한글을 입력해 주세요.')
+                return
         self.setHangulPresets()
         self.getRandomHangeulWords()
 
@@ -393,11 +413,25 @@ QLabel, QComboBox, QLineEdit{
     def presetTextCallback(self):
         self.setHangulPresets()
         
+    def glyphsForCharacters(self, characters):
+        glyphs = []
+        self.missingCharacters = []
+        for char in dict.fromkeys(characters):
+            if char.isspace():
+                continue
+            glyph = self.pFont.fl.findUnicode(ord(char))
+            if isinstance(glyph, fl6.flGlyph) and self.pFont.hasGlyph(glyph.name):
+                glyphs.append(self.pFont.glyph(glyph.name))
+            else:
+                self.missingCharacters.append(char)
+        return glyphs
+
     def setHangulPresets(self):
+        self.missingCharacters = []
         if self.presetTextComboBoxWidget.currentIndex == 0:
             self.chars.setText(self.charstring)
             self.chars.setEnabled(True)
-            self.selectedGlyphs = [self.pFont.glyph(nT.name(ord(char))) for char in self.chars.text[0:]]
+            self.selectedGlyphs = self.glyphsForCharacters(self.chars.text)
 
         elif self.presetTextComboBoxWidget.currentIndex == 1:
             if fl6.flWorkspace.instance().getActiveCanvas():
@@ -413,17 +447,17 @@ QLabel, QComboBox, QLineEdit{
         elif self.presetTextComboBoxWidget.currentIndex == 2:
             self.chars.setText(presetTextDict[self.presetTextComboBoxWidget.currentIndex])
             self.chars.setEnabled(False)
-            self.selectedGlyphs = [self.pFont.glyph(nT.name(ord(char))) for char in KSX_1001]
+            self.selectedGlyphs = self.glyphsForCharacters(KSX_1001)
         
         elif self.presetTextComboBoxWidget.currentIndex == 3:
             self.chars.setText(presetTextDict[self.presetTextComboBoxWidget.currentIndex])
             self.chars.setEnabled(False)
-            self.selectedGlyphs = [self.pFont.glyph(nT.name(ord(char))) for char in ADOBE_KR9]
+            self.selectedGlyphs = self.glyphsForCharacters(ADOBE_KR9)
         
         elif self.presetTextComboBoxWidget.currentIndex == 4:
             self.chars.setText(presetTextDict[self.presetTextComboBoxWidget.currentIndex])
             self.chars.setEnabled(False)
-            self.selectedGlyphs = [self.pFont.glyph(nT.name(i)) for i in range(FIRST_HANGUL_UNICODE, LAST_HANGUL_UNICODE)]
+            self.selectedGlyphs = self.glyphsForCharacters(chr(i) for i in range(FIRST_HANGUL_UNICODE, LAST_HANGUL_UNICODE + 1))
 
     
     def getRandomHangeulWords(self):
@@ -432,56 +466,43 @@ QLabel, QComboBox, QLineEdit{
         #2: Selected Glyphs in Font Window
         #3: All Glyphs in Font
 
-        realGlyphs=[]
+        if self.presetTextComboBoxWidget.currentIndex == 0 and self.missingCharacters:
+            print('현재 폰트에서 찾지 못한 문자: {}'.format(''.join(self.missingCharacters)))
+            return
+
+        koreanGlyphs = set()
         for glyph in self.selectedGlyphs:
-            if len(glyph.name.split('.', 1)) > 1:
-                glyph = self.pFont.glyph(glyph.name.split('.', 1)[0])
-                realGlyphs.append(glyph)
+            if getattr(glyph, 'fg', None) is None:
                 continue
-            realGlyphs.append(self.pFont.glyph(glyph.name))
+            baseName = glyph.name.split('.', 1)[0]
+            if baseName != glyph.name:
+                if not self.pFont.hasGlyph(baseName):
+                    continue
+                glyph = self.pFont.glyph(baseName)
+            codepoint = glyph.unicode
+            if not isinstance(codepoint, int) or not FIRST_HANGUL_UNICODE <= codepoint <= LAST_HANGUL_UNICODE:
+                continue
+            shapes = glyph.shapes()
+            if shapes and all(shape.contoursCount > 0 for shape in shapes):
+                koreanGlyphs.add(chr(codepoint))
 
-        chars = ''.join([chr(g.unicode) for g in realGlyphs])
-        # print(realGlyphs)
+        if not koreanGlyphs:
+            print('사용할 수 있는 한글 윤곽이 없습니다. 글리프와 현재 레이어를 확인해 주세요.')
+            return
 
-        if len(self.selectedGlyphs) < 1:
-            raise NotLetterException('')
-        elif not is_all_hangul(chars):
-            raise NotHangulException('')
-        
         try:
             wordCounts = self.wordCountSlider.value
-            sourceWordsCount = 500000  # the dictionary will be random-shrunk to this number of words
+            candidates = matchingWords(koreanGlyphs)
+            if not candidates:
+                print('입력한 글자만으로 구성된 단어를 사전에서 찾지 못했습니다. 다른 글자를 추가해 주세요.')
+                return
+            # Shuffle only the required sample, not the entire dictionary.
+            chosen = random.sample(candidates, min(wordCounts, len(candidates)))
+            if len(chosen) < wordCounts:
+                chosen = (chosen * ((wordCounts + len(chosen) - 1) // len(chosen)))[:wordCounts]
+                random.shuffle(chosen)
+            koreanWordsSimpler = [list(word) for word in chosen]
 
-            koreanDic = codecs.open(dicFileLocation, 'r', encoding='utf-8')
-            koreanWords = [line[:-1] for line in koreanDic.readlines()]
-            random.shuffle(koreanWords)
-            koreanWords = koreanWords[:sourceWordsCount]
-
-			# clean koreanGlyphs further by removing empty components
-            koreanGlyphs = [glyph for glyph in realGlyphs if len(glyph.shapes())>0]
-            removeGlyphs = []
-            for glyph in koreanGlyphs:
-                for shape in glyph.shapes():
-                    if shape.contoursCount == 0:
-                        removeGlyphs.append(glyph)
-            removeGlyphs = list(set(removeGlyphs))
-            koreanGlyphs = [chr(glyph.unicode) for glyph in koreanGlyphs if glyph not in removeGlyphs]
-            # print(removeGlyphs, koreanGlyphs)
-            
-            koreanWordsSimpler = []
-
-            for word in koreanWords:
-                letters = [letter for letter in word]
-                if len(set(letters)-set(koreanGlyphs))==0:
-                    koreanWordsSimpler.append(letters)
-
-            random.shuffle(koreanWordsSimpler)
-            if len(koreanWordsSimpler) < wordCounts:
-                koreanWordsSimpler = koreanWordsSimpler * (int(wordCounts / len(koreanWordsSimpler)) + 1)
-                random.shuffle(koreanWordsSimpler)
-            
-            koreanWordsSimpler = koreanWordsSimpler[:wordCounts]
-            
             if self.punctCheckBox.checked:
                 idx = 0
                 for i, word in enumerate(koreanWordsSimpler):
@@ -537,4 +558,16 @@ QLabel, QComboBox, QLineEdit{
             return True
         else: 
             return False
-Adhesiontext()
+_dialog = None
+
+
+def show_dialog():
+    global _dialog, flP
+    # Closing disconnects the window's application-state handler, so recreate
+    # a closed window and bind its settings to the current font.
+    if _dialog is None or not _dialog.isVisible():
+        flP = fl6.flPackage(fl6.CurrentFont())
+        _dialog = Adhesiontext()
+    _dialog.show()
+    _dialog.raise_()
+    return _dialog
