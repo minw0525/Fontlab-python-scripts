@@ -16,7 +16,7 @@ def generate(manager_ref, scripts_ref, source_root, output, manager_version='0.1
     for ref in (manager_ref, scripts_ref):
         if not re.fullmatch('[0-9a-f]{40}', ref):
             raise ValueError('Use full immutable commit SHAs')
-    script_metadata = json.loads((ROOT / 'release-scripts.json').read_text(encoding='utf-8'))
+    script_metadata = json.loads((ROOT / 'tools' / 'release-scripts.json').read_text(encoding='utf-8'))
     scripts = []
     for item in script_metadata['scripts']:
         p = {k: v for k, v in item.items() if k != 'files'}

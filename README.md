@@ -14,7 +14,7 @@ FontLab에서 설치기를 열거나 창에 드래그하면 매니저를 설치�
 
 ## FL8 Scripts
 
-*   **`Adhesiontext Korean/adhesiontext Korean for Fontlab.py`**
+*   **`Adhesiontext Korean.py` + `adhesiontext_korean/`**
     *   선택한 한글 음절, 혹은 선택한 범위 내의 한글 음절을 조합하여 랜덤한 한국어 단어 목록을 생성합니다.
     *   Generates a list of random Korean words by combining selected Hangul syllables or syllables within a selected range.
 
@@ -55,3 +55,16 @@ FontLab에서 설치기를 열거나 창에 드래그하면 매니저를 설치�
     *   Adds a wiggle effect to glyphs by manipulating the points on their outlines.
 
 
+
+## 저장소 구성
+
+```text
+MW_install.vfpy       # 사용자가 다운로드할 설치기
+manifest.json         # 고정 커밋과 SHA-256을 담은 배포 카탈로그
+FL8 Scripts/          # 개별 스크립트와 필수 자산
+manager/              # 매니저 런타임
+tools/                # 배포 생성기와 패키지 정의
+tests/                # 자동 테스트 및 FontLab 검증 도구
+Documentation/        # 사용·배포 안내, 요구사항, 검증 기록
+.github/workflows/    # Python 3.10 / 3.11 자동 테스트
+```

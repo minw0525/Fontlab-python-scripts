@@ -28,7 +28,7 @@ def run(snapshot):
         for module in (mwsm_core, mwsm_host, mwsm_ui):
             importlib.reload(module)
         audit = json.loads((ROOT / 'Documentation/upstream-audit.json').read_text())
-        definitions = json.loads((ROOT / 'release-scripts.json').read_text())
+        definitions = json.loads((ROOT / 'tools' / 'release-scripts.json').read_text())
         packages = []
         downloads = {}
         for p, evidence in zip(definitions['scripts'], audit['packages']):

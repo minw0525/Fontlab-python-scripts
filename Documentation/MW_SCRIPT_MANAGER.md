@@ -24,7 +24,7 @@ FontLab 8 내장 Python/PythonQt에서 실행하는 선택형 스크립트 매�
 | `manager/mwsm_core.py` | HTTPS, 검증, 저장소, 트랜잭션, 백업 복구, 롤백 |
 | `manager/mwsm_host.py` | FontLab 데이터 경로, 의존성 검사, 메뉴 새로고침, 패키지 실행 |
 | `manager/mwsm_ui.py` | PythonQt UI, 작업자 스레드와 메인 스레드 큐 처리 |
-| `release-scripts.json` | 배포할 10개 패키지의 명시적인 소스 파일 목록·개별 버전 |
+| `tools/release-scripts.json` | 배포할 10개 패키지의 명시적인 소스 파일 목록·개별 버전 |
 | `tools/build_installer.py` | 현재 런타임으로 `.vfpy` 재생성 |
 | `tools/build_manifest.py` | 실제 공개 커밋과 해시를 검증하여 `manifest.json` 생성 |
 | `Documentation/upstream-audit.json` | 조사 커밋·파일 크기·SHA-256·import 전수 조사 결과 |
@@ -35,7 +35,7 @@ FontLab 8 내장 Python/PythonQt에서 실행하는 선택형 스크립트 매�
 
 최초 배포에는 **코드 게시 → 카탈로그 게시** 두 단계가 필요합니다. 카탈로그 자신을 포함하는 미래 커밋의 SHA를 사전에 적을 수 없으므로, 실행 코드가 들어 있는 앞선 불변 커밋을 참조합니다.
 
-1. 이 프로젝트의 `manager/`, `MW_install.vfpy`, `tools/`, `release-scripts.json`을 지정된 공개 저장소에 추가합니다. 기존 `FL8 Scripts/` 소스를 덮어쓰지 않습니다.
+1. 이 프로젝트의 `manager/`, `MW_install.vfpy`, `tools/`을 지정된 공개 저장소에 추가합니다. 기존 `FL8 Scripts/` 소스를 덮어쓰지 않습니다.
 2. 런타임을 수정한 경우 `python3 tools/build_installer.py`로 설치기를 재생성합니다.
 3. 테스트를 실행하고 코드를 공개 저장소에 커밋·푸시합니다. 최초 0.1.0 코드 및 카탈로그는 게시되어 있습니다. 이후 릴리스에도 같은 순서를 따릅니다.
 4. 공개된 코드의 전체 40자리 커밋 SHA를 사용해 다음 명령을 실행합니다.
@@ -44,7 +44,7 @@ FontLab 8 내장 Python/PythonQt에서 실행하는 선택형 스크립트 매�
 python3 tools/build_manifest.py --manager-ref FULL_40_CHARACTER_COMMIT_SHA
 ```
 
-기본 스크립트 커밋은 조사한 `e38bd24e6d7bc57c0f383fd48570d5c6de7285c2`입니다. 스크립트를 갱신할 때는 `release-scripts.json`에서 해당 패키지 버전을 올린 뒤 `--scripts-ref`에 새로운 공개 커밋을 지정합니다. 매니저 버전은 `--manager-version`으로 지정합니다. `--source-root`는 로컬 원본 스냅샷과 원격 파일의 바이트 일치까지 확인할 때 사용합니다.
+기본 스크립트 커밋은 조사한 `e38bd24e6d7bc57c0f383fd48570d5c6de7285c2`입니다. 스크립트를 갱신할 때는 `tools/release-scripts.json`에서 해당 패키지 버전을 올린 뒤 `--scripts-ref`에 새로운 공개 커밋을 지정합니다. 매니저 버전은 `--manager-version`으로 지정합니다. `--source-root`는 로컬 원본 스냅샷과 원격 파일의 바이트 일치까지 확인할 때 사용합니다.
 
 macOS의 개발용 Python에서 CA 경로 누락 오류가 발생하면 기존 시스템 CA를 명시할 수 있습니다. `SSL_CERT_FILE=/etc/ssl/cert.pem python3 tools/build_manifest.py --manager-ref FULL_40_CHARACTER_COMMIT_SHA`로 실행하며 인증서 검증은 유지합니다. 이는 FontLab 내부의 `_ssl` 라이브러리 누락과는 다른 문제입니다.
 
