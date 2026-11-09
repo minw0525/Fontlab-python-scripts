@@ -2,8 +2,8 @@
   "schema_version": 1,
   "repository": "minw0525/Fontlab-python-scripts",
   "manager": {
-    "version": "0.1.0",
-    "source_ref": "2ff62a02c2c66f3a8f352007d21c47da26a13210",
+    "version": "0.1.1",
+    "source_ref": "3b8be08fc3dacc1e362d1e046ac338ceb4475d21",
     "files": [
       {
         "source": "manager/main.py",
@@ -13,17 +13,17 @@
       {
         "source": "manager/mwsm_core.py",
         "target": "mwsm_core.py",
-        "sha256": "6ca60b5129cd656eea30aac1a3a37031935ef4d819688dd94f573ef9ced0a63c"
+        "sha256": "8cd0c0e57bebb2a06eba3f0f53d1649688a403f5f7aac28237a2c4bd88f79fdb"
       },
       {
         "source": "manager/mwsm_host.py",
         "target": "mwsm_host.py",
-        "sha256": "f003af4e9e73780f2b74154d693298874ce49dd8c10c2621158320b982c38d57"
+        "sha256": "c7b92a840016bffdb7e6b2d4d76b5123ff0115699eca3ec9f6ad9f7eb9e5b3fa"
       },
       {
         "source": "manager/mwsm_ui.py",
         "target": "mwsm_ui.py",
-        "sha256": "b606d9f482251a628f3c698fdc90ab5f4ba5e89b0f190c739afb225cca18db7a"
+        "sha256": "e8c039a952f5d018006de5837e7dc97eb9e7da0a1cbcc6bc25012014681af3d8"
       }
     ]
   },
