@@ -2,7 +2,7 @@
 
 FontLab 8 내장 Python/PythonQt에서 실행하는 선택형 스크립트 매니저입니다. 고정 저장소 `minw0525/Fontlab-python-scripts`의 공개 매니페스트를 읽고, 선택한 패키지만 고정 커밋에서 다운로드합니다.
 
-**현재 상태: 0.1.0 미리보기 코드와 실제 배포 카탈로그 게시 완료.** 매니저 코드는 고정 커밋 `2ff62a02c2c66f3a8f352007d21c47da26a13210`에서 다운로드합니다. 현재 테스트한 FontLab 8.4.2에는 내장 SSL 로딩 오류가 있어 해당 환경의 온라인 설치는 여전히 차단됩니다. 상세한 검증 범위는 [검증 보고서](IMPLEMENTATION_STATUS.md)를 참고하세요.
+**현재 상태: 0.1.1 미리보기 업데이트.** 매니저 코드는 `manifest.json`이 지정한 고정 커밋에서 다운로드합니다. Python SSL이 누락되면 FontLab 내장 Qt HTTPS를 사용합니다. 상세한 검증 범위는 [검증 보고서](IMPLEMENTATION_STATUS.md)를 참고하세요.
 
 ## 사용자 사용법
 
@@ -29,7 +29,7 @@ FontLab 8 내장 Python/PythonQt에서 실행하는 선택형 스크립트 매�
 | `tools/build_manifest.py` | 실제 공개 커밋과 해시를 검증하여 `manifest.json` 생성 |
 | `Documentation/upstream-audit.json` | 조사 커밋·파일 크기·SHA-256·import 전수 조사 결과 |
 
-다운로드는 표준 라이브러리만 사용합니다. 매니저용 외부 Python, Git, pip, PyQt/PySide 설치는 필요하지 않습니다. 권장 버전과의 숫자 비교로 설치를 차단하지 않습니다.
+다운로드는 Python 표준 HTTPS를 우선 사용하며, 해당 기능이 없으면 FontLab 내장 Qt HTTPS를 사용합니다. Qt 네트워크 요청은 메인 스레드에서 비동기로 처리하고 기존 작업자 스레드에 결과를 전달합니다. 인증서 오류를 무시하지 않습니다. 매니저용 외부 Python, Git, pip, PyQt/PySide 설치는 필요하지 않습니다. 권장 버전과의 숫자 비교로 설치를 차단하지 않습니다.
 
 ## 개발자 배포 순서
 
@@ -79,6 +79,6 @@ python3 -m unittest discover -s tests -v
 
 ## 알려진 제한
 
-- 현재 macOS FontLab 8.4.2 내장 Python에서 `_ssl`이 외부 `libssl.3.dylib` 경로를 참조하여 로드되지 않았습니다. 매니저는 이를 명확히 표시하고 안전하게 중단합니다. TLS 검증 해제, 시스템 Python 설치, FontLab 앱 번들 수정 같은 우회는 하지 않습니다.
+- macOS FontLab 8.4.2 내장 Python의 `_ssl` 로딩 오류는 내장 Qt의 Secure Transport 사용으로 우회합니다. Python과 Qt 모두 HTTPS를 제공하지 못할 때만 설치를 중단합니다. TLS 검증 해제, 시스템 Python 설치, FontLab 앱 번들 수정 같은 우회는 하지 않습니다.
 - FontLab 시작 시 자동 확인 후크는 PRD의 MVP 예외에 따라 보류했습니다. 매니저 실행 시 확인은 구현되어 있습니다. 내부 캐시의 24시간 확인 기능은 후속 시작 후크에서 사용할 수 있습니다.
 - Windows, FontLab 8.2, Python 3.10 실기기 검증은 남아 있습니다. Python 3.10 문법 파싱 검증은 런타임 검증을 대체하지 않습니다.

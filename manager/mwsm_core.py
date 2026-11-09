@@ -19,6 +19,8 @@ import uuid
 REPOSITORY = 'minw0525/Fontlab-python-scripts'
 RAW = 'https://raw.githubusercontent.com/' + REPOSITORY + '/'
 CATALOG_URL = RAW + 'main/manifest.json'
+RUNTIME_VERSION = '0.1.1'
+HTTPS_FALLBACK = None
 MAX_FILE = 32 * 1024 * 1024
 MAX_PACKAGE = 100 * 1024 * 1024
 MARKER = '# MW Script Manager owned wrapper v1\n'
@@ -156,6 +158,8 @@ class Downloader:
     def __call__(self, url, limit=MAX_FILE):
         check_url(url)
         self.check_cancel()
+        if not hasattr(urllib.request, 'HTTPSHandler') and HTTPS_FALLBACK is not None:
+            return HTTPS_FALLBACK(url, limit, self.cancel, self.progress)
         if not hasattr(urllib.request, 'HTTPSHandler'):
             raise ManagerError('FontLab 내장 Python의 SSL 기능을 사용할 수 없습니다. '
                                'FontLab 설치/업데이트 상태를 확인하세요. 기존 설치는 유지됩니다.')

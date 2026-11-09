@@ -11,7 +11,7 @@ sys.path.insert(0, str(ROOT / 'manager'))
 from mwsm_core import Downloader, REPOSITORY, digest, json_bytes, source_url, validate_manifest
 
 
-def generate(manager_ref, scripts_ref, source_root, output, manager_version='0.1.0'):
+def generate(manager_ref, scripts_ref, source_root, output, manager_version='0.1.1'):
     fetch = Downloader()
     for ref in (manager_ref, scripts_ref):
         if not re.fullmatch('[0-9a-f]{40}', ref):
@@ -47,7 +47,7 @@ if __name__ == '__main__':
     parser.add_argument('--manager-ref', required=True)
     parser.add_argument('--scripts-ref', default='e38bd24e6d7bc57c0f383fd48570d5c6de7285c2')
     parser.add_argument('--source-root', type=Path)
-    parser.add_argument('--manager-version', default='0.1.0')
+    parser.add_argument('--manager-version', default='0.1.1')
     parser.add_argument('--output', type=Path, default=ROOT / 'manifest.json')
     args = parser.parse_args()
     generate(args.manager_ref, args.scripts_ref, args.source_root, args.output, args.manager_version)

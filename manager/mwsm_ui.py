@@ -4,7 +4,7 @@ import threading
 from PythonQt import QtCore, QtGui
 
 from mwsm_core import Cancelled, Downloader, ManagerError, Store, REPOSITORY
-from mwsm_host import compatibility, refresh_scripts
+from mwsm_host import compatibility, refresh_scripts, prepare_https
 
 _windows = []
 
@@ -16,6 +16,7 @@ def value(obj, name):
 
 class ManagerWindow:
     def __init__(self, env, bootstrap=False):
+        prepare_https()
         self.env = env
         self.bootstrap = bootstrap
         self.events = queue.Queue()

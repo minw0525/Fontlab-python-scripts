@@ -479,3 +479,7 @@ https://raw.githubusercontent.com/minw0525/Fontlab-python-scripts/<source_ref>/<
 6. GitHub Docs, *REST API — Repository contents*: https://docs.github.com/en/rest/repos/contents
 7. GitHub Docs, *REST API rate limits*: https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api
 8. 실측 저장소: https://github.com/minw0525/Fontlab-python-scripts 및 `FL8 Scripts/Adhesiontext Korean.py`, `FL8 Scripts/adhesiontext_korean/` (2026-11-09 조사)
+
+## 14. 구현 중 요구사항 보완 (2026-11-09)
+
+실제 FontLab 8.4.2에서 Python `_ssl` 로딩 실패가 확인되어 표준 라이브러리만으로는 최초 설치 목표를 달성할 수 없었다. 사용자 요청에 따라 0.1.1에서 **Python HTTPS가 없을 때 FontLab 내장 QtNetwork를 사용하는 대체 경로**를 허용한다. 별도 설치 없이 동작하며 인증서 검증·허용 호스트·크기 제한·취소 정책을 유지한다. 기존의 외부 GUI/Python/라이브러리 설치 금지 원칙은 유지한다.
