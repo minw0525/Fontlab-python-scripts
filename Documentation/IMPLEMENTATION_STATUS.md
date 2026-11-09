@@ -12,6 +12,12 @@
 - 표준 라이브러리 자동 테스트 **42개 통과**. 신규 9개는 원본 이름·신규 충돌·기존 래퍼 이전·멱등성·수정 보호·실패/강제 종료 복구·롤백 시 이름 복원을 확인.
 - FontLab의 실제 사용자 설치를 복사한 임시 환경에서 4개 기존 래퍼 이름 이전 확인. 새 UI 선택·상세·선택 수 반영 및 Flag Glyphs 다운로드 설치 확인. `Flag Glyphs.py` / `#FLM: MW: Flag Glyphs` 생성 확인.
 
+- 실제 사용자 경로에도 매니저 **0.2.0** 설치 완료. 기존 4개 패키지의 버전·소스·설정이 이전 복사본과 동일하며, 원본 파일명과 `#FLM: MW: ...` 메뉴 이름으로 이전됨을 확인.
+- 생성된 메뉴 진입점을 다시 실행하여 `script_manager/manager/0.2.0`의 설치된 런타임 로드 확인. 공개 카탈로그 10개 표시, 실제 설치 완료 화면 확인.
+- [GitHub Actions: Python 3.10 / 3.11 통과](https://github.com/minw0525/Fontlab-python-scripts/actions/runs/42632897946).
+
+배포 코드 커밋: `656a87b83b63dc89a3a9a94842ae4a7d6b6438bb`.
+
 ## 0.1.1에서 확인한 HTTPS 설치 결과
 
 현재 macOS FontLab 8.4.2의 Python `_ssl` 로딩 실패는 **FontLab 내장 Qt HTTPS / Secure Transport**로 해결했습니다. 시스템 Python이나 별도 라이브러리를 설치하지 않았고, 인증서 검증을 해제하거나 FontLab 앱 번들을 수정하지 않았습니다.
