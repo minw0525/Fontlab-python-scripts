@@ -7,6 +7,7 @@ import os
 from pathlib import Path, PurePosixPath
 import re
 import shutil
+import stat
 import sys
 import tempfile
 import threading
@@ -19,7 +20,7 @@ import uuid
 REPOSITORY = 'minw0525/Fontlab-python-scripts'
 RAW = 'https://raw.githubusercontent.com/' + REPOSITORY + '/'
 CATALOG_URL = RAW + 'main/manifest.json'
-RUNTIME_VERSION = '0.1.1'
+RUNTIME_VERSION = '0.2.0'
 HTTPS_FALLBACK = None
 MAX_FILE = 32 * 1024 * 1024
 MAX_PACKAGE = 100 * 1024 * 1024
@@ -68,9 +69,13 @@ def safe_path(root, value):
     target = root.joinpath(*value.split('/'))
     # Walk all ancestors, including root: reject symlinks and Windows junctions.
     for p in [target] + list(target.parents):
-        if p.is_symlink():
+        try:
+            info = p.lstat()
+        except FileNotFoundError:
+            continue
+        if stat.S_ISLNK(info.st_mode):
             raise ManagerError('심볼릭 링크 경로는 사용할 수 없습니다: ' + str(p))
-        if p.exists() and getattr(p.lstat(), 'st_file_attributes', 0) & 0x400:
+        if getattr(info, 'st_file_attributes', 0) & 0x400:
             raise ManagerError('Windows reparse 경로는 사용할 수 없습니다: ' + str(p))
     return target
 
@@ -247,9 +252,12 @@ def validate_state(s):
     return s
 
 
-def wrapper(package_id=None):
+def wrapper(package_id=None, header=None):
     name = 'MW Script Manager' if package_id is None else 'MW · ' + token(package_id)
-    return ('#FLM: ' + name + '\n' + MARKER +
+    header = header or '#FLM: ' + name
+    if not header.startswith('#FLM:') or any(ord(c) < 32 for c in header):
+        raise ManagerError('잘못된 메뉴 이름')
+    return (header + '\n' + MARKER +
             'from pathlib import Path\nimport json, runpy\nfrom fontlab import flPreferences\n'
             '_mw_root = Path(flPreferences.instance().dataPath) / "script_manager"\n'
             '_mw_state = json.loads((_mw_root / "state.json").read_text(encoding="utf-8"))\n'
@@ -317,14 +325,16 @@ class Store:
         finally:
             stream.close()  # OS releases the lock, including after a crashed process.
 
-    def journal(self, stage, state, moves, created_wrapper=None):
+    def journal(self, stage, state, moves, created_wrapper=None, wrapper_content=None):
         # Even a same-version repair needs a distinct commit marker.
         state['transaction_id'] = uuid.uuid4().hex
         def local(path):
             return path.relative_to(self.user_data).as_posix()
         data = {'state_sha256': digest(json_bytes(state)),
                 'moves': [[local(a), local(b)] for a, b in moves],
-                'wrapper': local(created_wrapper) if created_wrapper else None}
+                'wrapper': local(created_wrapper) if created_wrapper else None,
+                'wrapper_sha256': digest(wrapper_content) if wrapper_content is not None else None,
+                'wrapper_previous_sha256': digest(created_wrapper.read_bytes()) if created_wrapper and created_wrapper.is_file() else None}
         atomic_write(stage / 'transaction.json', json_bytes(data))
 
     def recover_transactions(self):
@@ -334,7 +344,7 @@ class Store:
             receipt = stage / 'transaction.json'
             if not receipt.exists():
                 # An interrupted download has not touched active files.
-                if stage.is_dir() and stage.name.startswith(('install-', 'remove-')):
+                if stage.is_dir() and stage.name.startswith(('install-', 'remove-', 'wrapper-')):
                     shutil.rmtree(stage)
                 continue
             receipt = safe_path(stage, 'transaction.json')
@@ -342,6 +352,21 @@ class Store:
             current = safe_path(self.root, 'state.json')
             committed = current.exists() and digest(current.read_bytes()) == data['state_sha256']
             if not committed:
+                name = data.get('wrapper')
+                if name:
+                    path = safe_path(self.user_data, name)
+                    package_id = None if name == 'Scripts/MW Script Manager.py' else path.stem
+                    if name != 'Scripts/MW Script Manager.py' and not name.startswith('Scripts/MW Scripts/'):
+                        raise ManagerError('복구 래퍼 경로 오류')
+                    if path.exists():
+                        actual = digest(path.read_bytes())
+                        moved = any(source == name and safe_path(self.user_data, dest).exists() for source, dest in data['moves'])
+                        if actual == data.get('wrapper_previous_sha256') and not moved:
+                            pass  # Crash before the original wrapper was moved aside.
+                        elif actual == (data.get('wrapper_sha256') or digest(wrapper(package_id))):
+                            path.unlink()
+                        else:
+                            raise ManagerError('복구 대상 래퍼가 수정되었습니다')
                 for source, dest in reversed(data['moves']):
                     # Journals may only rename managed storage or a generated wrapper.
                     for name in (source, dest):
@@ -351,16 +376,6 @@ class Store:
                     if not source.exists() and dest.exists():
                         source.parent.mkdir(parents=True, exist_ok=True)
                         os.replace(dest, source)
-                name = data.get('wrapper')
-                if name:
-                    path = safe_path(self.user_data, name)
-                    package_id = None if name == 'Scripts/MW Script Manager.py' else path.stem
-                    if name != 'Scripts/MW Script Manager.py' and not name.startswith('Scripts/MW Scripts/'):
-                        raise ManagerError('복구 래퍼 경로 오류')
-                    if path.exists():
-                        if path.read_bytes() != wrapper(package_id):
-                            raise ManagerError('복구 대상 래퍼가 수정되었습니다')
-                        path.unlink()
             shutil.rmtree(stage)
             self.log('recovered interrupted transaction ' + stage.name)
 
@@ -403,7 +418,67 @@ class Store:
     def wrapper_path(self, package_id=None):
         if package_id is None:
             return safe_path(self.user_data, 'Scripts/MW Script Manager.py')
-        return safe_path(self.user_data, 'Scripts/MW Scripts/' + token(package_id) + '.py')
+        record = self.read_state()['packages'].get(package_id, {})
+        filename = record.get('wrapper', {}).get('filename', token(package_id) + '.py')
+        return self.named_wrapper_path(filename)
+
+    def named_wrapper_path(self, filename):
+        relative(filename)
+        if '/' in filename or not filename.endswith('.py'):
+            raise ManagerError('잘못된 실행 파일명')
+        return safe_path(self.user_data, 'Scripts/MW Scripts/' + filename)
+
+    def wrapper_metadata(self, p, entry):
+        filename = PurePosixPath(p['entrypoint']).name
+        header = next((line for line in entry.decode('utf-8-sig').splitlines()
+                       if line.startswith('#FLM:')), '#FLM: ' + p['name'])
+        wrapper(p['id'], header)  # Validate a single-line menu label.
+        return {'filename': filename, 'header': header, 'source_version': p['version']}
+
+    def migrate_wrappers(self):
+        """Restore source names without downloading or changing package versions."""
+        changed = []
+        with self.locked():
+            state = self.read_state()
+            for key, record in state['packages'].items():
+                if record.get('wrapper', {}).get('source_version') == record['active_version']:
+                    continue
+                p = record['versions'][record['active_version']]
+                self.verify(p)
+                meta = self.wrapper_metadata(p, safe_path(self.version_dir(p), p['entrypoint']).read_bytes())
+                if record.get('wrapper') == meta:
+                    continue
+                old = self.check_wrapper(key, allow_missing=True)
+                target = self.named_wrapper_path(meta['filename'])
+                if target != old and target.exists():
+                    raise ManagerError('기존 파일과 충돌합니다: ' + str(target))
+                for other, other_record in state['packages'].items():
+                    if other != key and path_key(other_record.get('wrapper', {}).get('filename', other + '.py')) == path_key(meta['filename']):
+                        raise ManagerError('다른 패키지가 사용 중인 파일명: ' + meta['filename'])
+                content = wrapper(key, meta['header'])
+                stage = Path(tempfile.mkdtemp(prefix='wrapper-', dir=str(self.root / 'staging')))
+                saved = stage / 'old.py'
+                new_state = copy.deepcopy(state)
+                new_state['packages'][key]['wrapper'] = meta
+                self.journal(stage, new_state, [(old, saved)] if old.exists() else [], target, content)
+                committed = created = False
+                try:
+                    if old.exists():
+                        os.replace(old, saved)
+                    atomic_write(target, content)
+                    created = True
+                    self.save_state(new_state)
+                    committed = True
+                    state = new_state
+                    changed.append(key)
+                finally:
+                    if not committed:
+                        if created:
+                            target.unlink()
+                        if saved.exists():
+                            os.replace(saved, old)
+                    shutil.rmtree(stage, ignore_errors=True)
+            return changed
 
     def verify(self, p, manager=False):
         base = self.version_dir(p, manager)
@@ -421,8 +496,10 @@ class Store:
 
     def check_wrapper(self, package_id, allow_missing=False):
         path = self.wrapper_path(package_id)
+        record = self.read_state()['packages'].get(package_id, {}) if package_id else {}
+        content = wrapper(package_id, record.get('wrapper', {}).get('header'))
         if path.exists():
-            if not path.is_file() or path.read_bytes() != wrapper(package_id):
+            if not path.is_file() or path.read_bytes() != content:
                 raise ManagerError('기존 파일과 충돌합니다 (자동 덮어쓰기 금지): ' + str(path))
         elif not allow_missing:
             raise ManagerError('실행 래퍼가 없습니다: ' + str(path))
@@ -445,11 +522,20 @@ class Store:
             target_wrapper = self.check_wrapper(package_id, allow_missing=True)
             if record is None and target_wrapper.exists():
                 raise ManagerError('소유 기록 없는 동명 실행 파일: ' + str(target_wrapper))
+            old_wrapper = target_wrapper
+            if not manager:
+                target_wrapper = self.named_wrapper_path(PurePosixPath(p['entrypoint']).name)
+                if target_wrapper != old_wrapper and target_wrapper.exists():
+                    raise ManagerError('기존 파일과 충돌합니다: ' + str(target_wrapper))
+                for other, other_record in state['packages'].items():
+                    if other != package_id and path_key(other_record.get('wrapper', {}).get('filename', other + '.py')) == path_key(target_wrapper.name):
+                        raise ManagerError('다른 패키지가 사용 중인 파일명: ' + target_wrapper.name)
             dest = self.version_dir(p, manager)
             if dest.exists() and (not record or p['version'] not in record['versions']):
                 raise ManagerError('소유 기록 없는 버전 폴더: ' + str(dest))
             stage = Path(tempfile.mkdtemp(prefix='install-', dir=str(self.root / 'staging')))
             displaced = None
+            wrapper_backup = None
             created_dest = created_wrapper = committed = False
             try:
                 payload = stage / 'payload'
@@ -473,6 +559,10 @@ class Store:
                     new['previous_version'] = old
                 new['active_version'] = p['version']
                 new['versions'][p['version']] = copy.deepcopy(p)
+                meta = None if manager else self.wrapper_metadata(p, safe_path(payload, p['entrypoint']).read_bytes())
+                content = wrapper(package_id, meta['header'] if meta else None)
+                if meta:
+                    new['wrapper'] = meta
                 state['history'][key] = fingerprint
                 if manager:
                     state['manager'] = new
@@ -483,7 +573,10 @@ class Store:
                     moves.append((dest, stage / 'previous'))
                 if not dest.exists() or (manager and repair):
                     moves.append((payload, dest))
-                self.journal(stage, state, moves, target_wrapper if not target_wrapper.exists() else None)
+                replace_wrapper = not old_wrapper.exists() or old_wrapper != target_wrapper or old_wrapper.read_bytes() != content
+                if replace_wrapper and old_wrapper.exists():
+                    moves.append((old_wrapper, stage / 'wrapper.py'))
+                self.journal(stage, state, moves, target_wrapper if replace_wrapper else None, content)
                 dest.parent.mkdir(parents=True, exist_ok=True)
                 if dest.exists():
                     if manager and repair:
@@ -494,8 +587,11 @@ class Store:
                 if not dest.exists():
                     os.replace(payload, dest)
                     created_dest = True
-                if not target_wrapper.exists():
-                    atomic_write(target_wrapper, wrapper(package_id))
+                if replace_wrapper:
+                    if old_wrapper.exists():
+                        wrapper_backup = stage / 'wrapper.py'
+                        os.replace(old_wrapper, wrapper_backup)
+                    atomic_write(target_wrapper, content)
                     created_wrapper = True
                 self.save_state(state)
                 committed = True
@@ -504,6 +600,8 @@ class Store:
                 if not committed:
                     if created_wrapper:
                         target_wrapper.unlink()
+                    if wrapper_backup is not None and wrapper_backup.exists():
+                        os.replace(wrapper_backup, old_wrapper)
                     if created_dest:
                         shutil.rmtree(dest)
                     if displaced is not None and displaced.exists():
@@ -537,6 +635,7 @@ class Store:
             record['auto_update'] = False
             self.save_state(state)
             self.log('rollback ' + package_id + '/' + previous)
+        self.migrate_wrappers()
 
     def remove(self, package_id):
         with self.locked():

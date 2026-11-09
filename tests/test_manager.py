@@ -71,7 +71,7 @@ class StoreTests(unittest.TestCase):
         self.assertEqual(list(state['packages']), ['sample'])
         self.assertEqual(len(state['packages']['sample']['versions']), 1)
         self.assertEqual(self.store.wrapper_path('sample').parent.name, 'MW Scripts')
-        self.assertEqual(self.store.wrapper_path('sample').read_bytes(), wrapper('sample'))
+        self.assertEqual(self.store.wrapper_path('sample').read_bytes(), wrapper('sample', '#FLM: sample'))
         self.assertEqual(list((self.store.root / 'staging').iterdir()), [])
 
     def test_hash_failure_preserves_existing_state(self):
@@ -275,6 +275,115 @@ s.remove('sample')
         finally:
             sys.modules.pop('helper', None)
             _sessions.clear()
+
+    def legacy_install(self, files=None):
+        p = self.install(files=files or {'Original Script.py': b'#FLM: MW: Original Script\nprint(1)\n'})
+        state = self.store.read_state()
+        current = self.store.wrapper_path('sample')
+        legacy = current.parent / 'sample.py'
+        current.unlink()
+        legacy.write_bytes(wrapper('sample'))
+        del state['packages']['sample']['wrapper']
+        self.store.save_state(state)
+        return p, legacy
+
+    def test_preserves_original_filename_and_flm(self):
+        p = self.install(files={'Original Script.py': b'#FLM: MW: Original Menu Name\nprint(1)\n'})
+        path = self.store.wrapper_path('sample')
+        self.assertEqual(path.name, 'Original Script.py')
+        self.assertEqual(path.read_text().splitlines()[0], '#FLM: MW: Original Menu Name')
+        self.assertEqual((self.store.version_dir(p) / 'Original Script.py').read_bytes(), b'#FLM: MW: Original Menu Name\nprint(1)\n')
+
+    def test_legacy_wrapper_migration_is_idempotent(self):
+        p, old = self.legacy_install()
+        before = self.store.read_state()['packages']['sample']['versions']
+        self.assertEqual(self.store.migrate_wrappers(), ['sample'])
+        self.assertFalse(old.exists())
+        target = self.store.wrapper_path('sample')
+        self.assertEqual(target.name, 'Original Script.py')
+        self.assertEqual(target.read_text().splitlines()[0], '#FLM: MW: Original Script')
+        self.assertEqual(self.store.migrate_wrappers(), [])
+        self.assertEqual(self.store.read_state()['packages']['sample']['versions'], before)
+
+    def test_migration_keeps_conflicting_user_file_and_old_wrapper(self):
+        p, old = self.legacy_install()
+        target = old.with_name('Original Script.py')
+        target.write_text('# user file')
+        with self.assertRaisesRegex(ManagerError, '충돌'):
+            self.store.migrate_wrappers()
+        self.assertEqual(target.read_text(), '# user file')
+        self.assertEqual(old.read_bytes(), wrapper('sample'))
+        self.assertNotIn('wrapper', self.store.read_state()['packages']['sample'])
+
+    def test_migration_refuses_modified_owned_wrapper(self):
+        p, old = self.legacy_install()
+        old.write_bytes(old.read_bytes() + b'# user change\n')
+        with self.assertRaisesRegex(ManagerError, '충돌'):
+            self.store.migrate_wrappers()
+        self.assertTrue(old.exists())
+
+    def test_migration_commit_failure_restores_old_wrapper(self):
+        p, old = self.legacy_install()
+        with patch.object(self.store, 'save_state', side_effect=PermissionError('locked')):
+            with self.assertRaises(PermissionError):
+                self.store.migrate_wrappers()
+        self.assertEqual(old.read_bytes(), wrapper('sample'))
+        self.assertFalse(old.with_name('Original Script.py').exists())
+
+    def test_migration_crash_same_filename_restores_old_header(self):
+        p, old = self.legacy_install(files={'sample.py': b'#FLM: MW: Original\n'})
+        code = '''import sys, os
+sys.path.insert(0, sys.argv[1])
+from mwsm_core import Store
+s=Store(sys.argv[2])
+s.save_state=lambda state: os._exit(73)
+s.migrate_wrappers()
+'''
+        result = subprocess.run([sys.executable, '-c', code, str(ROOT / 'manager'), str(self.root)])
+        self.assertEqual(result.returncode, 73)
+        with self.store.locked():
+            pass
+        self.assertEqual(old.read_bytes(), wrapper('sample'))
+        self.assertNotIn('wrapper', self.store.read_state()['packages']['sample'])
+
+    def test_migration_crash_before_first_rename_keeps_original(self):
+        p, old = self.legacy_install(files={'sample.py': b'#FLM: MW: Original\n'})
+        code = """import sys, os
+sys.path.insert(0, sys.argv[1])
+from mwsm_core import Store
+s=Store(sys.argv[2])
+original=s.journal
+def interrupted(*args, **kwargs):
+ original(*args, **kwargs)
+ os._exit(73)
+s.journal=interrupted
+s.migrate_wrappers()
+"""
+        result = subprocess.run([sys.executable, '-c', code, str(ROOT / 'manager'), str(self.root)])
+        self.assertEqual(result.returncode, 73)
+        with self.store.locked():
+            pass
+        self.assertEqual(old.read_bytes(), wrapper('sample'))
+
+    def test_new_install_does_not_overwrite_original_named_user_file(self):
+        p = self.add()
+        target = self.store.named_wrapper_path('Run.py')
+        target.parent.mkdir(parents=True)
+        target.write_text('# user')
+        with self.assertRaisesRegex(ManagerError, '충돌'):
+            self.store.install(p)
+        self.assertEqual(target.read_text(), '# user')
+        self.assertFalse(self.store.read_state()['packages'])
+
+    def test_update_and_rollback_restore_entrypoint_name(self):
+        self.install(files={'First.py': b'#FLM: MW: First\n'})
+        self.install('2.0.0', files={'Second.py': b'#FLM: MW: Second\n'})
+        second = self.store.wrapper_path('sample')
+        self.assertEqual(second.name, 'Second.py')
+        self.assertFalse(second.with_name('First.py').exists())
+        self.store.rollback('sample')
+        self.assertEqual(self.store.wrapper_path('sample').name, 'First.py')
+        self.assertFalse(second.exists())
 
 
 class ValidationTests(unittest.TestCase):
