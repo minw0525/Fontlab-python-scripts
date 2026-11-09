@@ -2,7 +2,7 @@
 
 FontLab 8 내장 Python/PythonQt에서 실행하는 선택형 스크립트 매니저입니다. 고정 저장소 `minw0525/Fontlab-python-scripts`의 공개 매니페스트를 읽고, 선택한 패키지만 고정 커밋에서 다운로드합니다.
 
-**현재 상태: 0.1.1 미리보기 업데이트.** 매니저 코드는 `manifest.json`이 지정한 고정 커밋에서 다운로드합니다. Python SSL이 누락되면 FontLab 내장 Qt HTTPS를 사용합니다. 상세한 검증 범위는 [검증 보고서](IMPLEMENTATION_STATUS.md)를 참고하세요.
+**현재 상태: 0.1.1 게시 및 macOS FontLab 8.4.2 실제 설치 검증 완료.** 매니저 코드는 `manifest.json`이 지정한 고정 커밋에서 다운로드합니다. Python SSL이 누락되면 FontLab 내장 Qt HTTPS를 사용합니다. 상세한 검증 범위는 [검증 보고서](IMPLEMENTATION_STATUS.md)를 참고하세요.
 
 ## 사용자 사용법
 
