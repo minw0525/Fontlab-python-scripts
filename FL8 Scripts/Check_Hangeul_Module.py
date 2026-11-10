@@ -13,7 +13,7 @@ from typerig.proxy.fl.application.app import *
 from typerig.proxy.fl.gui import QtGui
 from PythonQt import QtCore
 
-app_version = '1.0.0'
+app_version = '1.0.1'
 app_name = 'Minwoo | Check Hangeul Module'
 qapp = QtGui.QApplication.instance()
 flP = fl6.flPackage(fl6.CurrentFont())

@@ -7,7 +7,7 @@ import FL as legacy
 from typerig.proxy.fl.objects.font import pFont
 from typerig.proxy.fl.gui.widgets import getProcessGlyphs
 
-app_version = '1.0.0'
+app_version = '1.0.1'
 pMode = 1
 # if mode == 0: [selected glyph]
 # if mode == 1: [glyphs in edit window]

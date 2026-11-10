@@ -131,7 +131,6 @@ class ManagerWindow:
         self.timer = QtCore.QTimer(self.dialog)
         self.timer.connect('timeout()', self.poll)
         self.timer.start(100)
-        self.setWindowFlags(self.windowFlags() | QtCore.WindowStaysOnTopHint)
         self.render()
         self.dialog.show()
         self.refresh()

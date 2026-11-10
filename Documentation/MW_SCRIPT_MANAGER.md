@@ -41,12 +41,12 @@ FontLab 8 내장 Python/PythonQt에서 실행하는 선택형 스크립트 매�
 4. 공개된 코드의 전체 40자리 커밋 SHA를 사용해 다음 명령을 실행합니다.
 
 ```sh
-python3 tools/build_manifest.py --manager-ref FULL_40_CHARACTER_COMMIT_SHA
+python3 tools/build_manifest.py --manager-ref MANAGER_COMMIT_SHA --scripts-ref SCRIPTS_COMMIT_SHA
 ```
 
-기본 스크립트 커밋은 조사한 `e38bd24e6d7bc57c0f383fd48570d5c6de7285c2`입니다. 스크립트를 갱신할 때는 `tools/release-scripts.json`에서 해당 패키지 버전을 올린 뒤 `--scripts-ref`에 새로운 공개 커밋을 지정합니다. 매니저 버전은 `--manager-version`으로 지정합니다. `--source-root`는 로컬 원본 스냅샷과 원격 파일의 바이트 일치까지 확인할 때 사용합니다.
+두 커밋은 공개 GitHub의 전체 40자리 SHA를 지정합니다. 생성기는 스크립트 원본의 `app_version`을 읽고, 배포 파일의 SHA-256을 계산합니다. 스크립트를 수정하거나 이름을 바꾸면 원본의 버전을 올려 공개한 뒤 카탈로그를 다시 생성하고 커밋하세요. 매니저 버전은 `--manager-version`으로 지정합니다. `--source-root`는 로컬 원본과 원격 파일의 바이트 일치까지 확인합니다.
 
-macOS의 개발용 Python에서 CA 경로 누락 오류가 발생하면 기존 시스템 CA를 명시할 수 있습니다. `SSL_CERT_FILE=/etc/ssl/cert.pem python3 tools/build_manifest.py --manager-ref FULL_40_CHARACTER_COMMIT_SHA`로 실행하며 인증서 검증은 유지합니다. 이는 FontLab 내부의 `_ssl` 라이브러리 누락과는 다른 문제입니다.
+macOS의 개발용 Python에서 CA 경로 누락 오류가 발생하면 기존 시스템 CA를 명시할 수 있습니다. `SSL_CERT_FILE=/etc/ssl/cert.pem python3 tools/build_manifest.py --manager-ref MANAGER_COMMIT_SHA --scripts-ref SCRIPTS_COMMIT_SHA`로 실행하며 인증서 검증은 유지합니다. 이는 FontLab 내부의 `_ssl` 라이브러리 누락과는 다른 문제입니다.
 
 생성기는 코드와 자산을 고정 커밋에서 개별 다운로드하고 실제 SHA-256을 계산합니다. 매니저의 로컬 코드와 원격 코드가 다르거나 404가 발생하면 출력을 만들지 않습니다. 동일 ID/버전의 파일 내용 변경은 설치 시에도 거부합니다.
 

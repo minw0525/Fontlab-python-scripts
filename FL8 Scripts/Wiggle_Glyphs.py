@@ -60,7 +60,7 @@ color_coral = QtGui.QColor('coral')
 
 
 # init ====
-app_name, app_version = 'Minwoo | Wiggle Glyphs', '1.0.0'
+app_name, app_version = 'Minwoo | Wiggle Glyphs', '1.0.1'
 
 
 # Style Sheet ====

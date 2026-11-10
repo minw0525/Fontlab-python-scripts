@@ -20,7 +20,7 @@ nT = fgt.fgNametable()
 
 
 # init ====
-app_name, app_version = 'Minwoo | Flag Glyphs', '1.0.0'
+app_name, app_version = 'Minwoo | Flag Glyphs', '1.0.1'
 
 # Config ====
 column_names = ['Index', 'Character', 'Name', 'Unicode', 'Tags']

@@ -4,7 +4,6 @@
       "id": "adhesiontext-korean",
       "name": "Adhesiontext Korean",
       "description": "선택한 한글 음절로 구성할 수 있는 사전 단어 생성",
-      "version": "1.0.0",
       "recommended_fontlab": "8.2+",
       "target_python": "3.11",
       "platforms": [
@@ -14,19 +13,19 @@
       "requirements": [
         "TypeRig"
       ],
-      "entrypoint": "Adhesiontext Korean.py",
+      "entrypoint": "Adhesiontext_Korean.py",
       "files": [
-        "FL8 Scripts/Adhesiontext Korean.py",
+        "FL8 Scripts/Adhesiontext_Korean.py",
         "FL8 Scripts/adhesiontext_korean/Korean Dictionary.txt",
         "FL8 Scripts/adhesiontext_korean/__init__.py",
         "FL8 Scripts/adhesiontext_korean/app.py"
-      ]
+      ],
+      "version_file": "FL8 Scripts/adhesiontext_korean/app.py"
     },
     {
       "id": "check-negative-side-bearing",
       "name": "Check Negative Side-bearing",
       "description": "음수 사이드베어링을 가진 글리프 확인",
-      "version": "1.0.0",
       "recommended_fontlab": "8.2+",
       "target_python": "3.11",
       "platforms": [
@@ -36,16 +35,15 @@
       "requirements": [
         "TypeRig"
       ],
-      "entrypoint": "Check Negative Side-bearing.py",
+      "entrypoint": "Check_Negative_Side-bearing.py",
       "files": [
-        "FL8 Scripts/Check Negative Side-bearing.py"
+        "FL8 Scripts/Check_Negative_Side-bearing.py"
       ]
     },
     {
       "id": "check-hangeul-module",
       "name": "Check Hangeul Module",
       "description": "편집 문자열의 초성·종성을 치환해 한글 모듈 확인",
-      "version": "1.0.0",
       "recommended_fontlab": "8.2+",
       "target_python": "3.11",
       "platforms": [
@@ -62,9 +60,8 @@
     },
     {
       "id": "edit-component-sources",
-      "name": "Edit Component Sources",
+      "name": "Expand Component Sources",
       "description": "선택 글리프의 컴포넌트 소스를 새 창에 나열",
-      "version": "1.0.0",
       "recommended_fontlab": "8.2+",
       "target_python": "3.11",
       "platforms": [
@@ -74,16 +71,15 @@
       "requirements": [
         "TypeRig"
       ],
-      "entrypoint": "Edit Component Sources.py",
+      "entrypoint": "Expand_Component_Sources.py",
       "files": [
-        "FL8 Scripts/Edit Component Sources.py"
+        "FL8 Scripts/Expand_Component_Sources.py"
       ]
     },
     {
       "id": "flag-glyphs",
       "name": "Flag Glyphs",
       "description": "선택한 글리프의 플래그 일괄 지정",
-      "version": "1.0.0",
       "recommended_fontlab": "8.2+",
       "target_python": "3.11",
       "platforms": [
@@ -93,16 +89,15 @@
       "requirements": [
         "TypeRig"
       ],
-      "entrypoint": "Flag Glyphs.py",
+      "entrypoint": "Flag_Glyphs.py",
       "files": [
-        "FL8 Scripts/Flag Glyphs.py"
+        "FL8 Scripts/Flag_Glyphs.py"
       ]
     },
     {
       "id": "generate-hangeul-composition",
       "name": "Generate Hangeul Composition",
       "description": "선택한 초성·중성·종성을 조합해 한글 문자열 생성",
-      "version": "1.0.0",
       "recommended_fontlab": "8.2+",
       "target_python": "3.11",
       "platforms": [
@@ -121,7 +116,6 @@
       "id": "jitter-glyphs",
       "name": "Jitter Glyphs",
       "description": "글리프 노드에 무작위 변형 적용",
-      "version": "1.0.0",
       "recommended_fontlab": "8.2+",
       "target_python": "3.11",
       "platforms": [
@@ -131,16 +125,15 @@
       "requirements": [
         "TypeRig"
       ],
-      "entrypoint": "Jitter Glyphs.py",
+      "entrypoint": "Jitter_Glyphs.py",
       "files": [
-        "FL8 Scripts/Jitter Glyphs.py"
+        "FL8 Scripts/Jitter_Glyphs.py"
       ]
     },
     {
       "id": "projective-transform",
       "name": "Projective Transform",
       "description": "글리프에 원근 변형 적용",
-      "version": "1.0.0",
       "recommended_fontlab": "8.2+",
       "target_python": "3.11",
       "platforms": [
@@ -157,9 +150,8 @@
     },
     {
       "id": "reset-component-layer",
-      "name": "Reset Component layer",
+      "name": "Reset Component Layer",
       "description": "컴포넌트 레이어 재설정",
-      "version": "1.0.0",
       "recommended_fontlab": "8.2+",
       "target_python": "3.11",
       "platforms": [
@@ -178,7 +170,6 @@
       "id": "wiggle-glyphs",
       "name": "Wiggle Glyphs",
       "description": "글리프 형태에 흔들림 변형 적용",
-      "version": "1.0.0",
       "recommended_fontlab": "8.2+",
       "target_python": "3.11",
       "platforms": [
@@ -188,9 +179,169 @@
       "requirements": [
         "TypeRig"
       ],
-      "entrypoint": "Wiggle Glyphs.py",
+      "entrypoint": "Wiggle_Glyphs.py",
       "files": [
-        "FL8 Scripts/Wiggle Glyphs.py"
+        "FL8 Scripts/Wiggle_Glyphs.py"
+      ]
+    },
+    {
+      "id": "build-asterisk",
+      "name": "Build Asterisk",
+      "description": "글리프에 별표 생성",
+      "recommended_fontlab": "8.2+",
+      "target_python": "3.11",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
+      "requirements": [
+        "TypeRig"
+      ],
+      "entrypoint": "Build_Asterisk.py",
+      "files": [
+        "FL8 Scripts/Build_Asterisk.py"
+      ]
+    },
+    {
+      "id": "build-cjk-global-guide",
+      "name": "Build CJK Global Guide",
+      "description": "CJK 글꼴의 전역 가이드 생성",
+      "recommended_fontlab": "8.2+",
+      "target_python": "3.11",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
+      "requirements": [
+        "TypeRig"
+      ],
+      "entrypoint": "Build_CJK_Global_Guide.py",
+      "files": [
+        "FL8 Scripts/Build_CJK_Global_Guide.py"
+      ]
+    },
+    {
+      "id": "build-hangul-reference-masks",
+      "name": "Build Hangul Reference Masks",
+      "description": "한글 참조 마스크 생성",
+      "recommended_fontlab": "8.2+",
+      "target_python": "3.11",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
+      "requirements": [
+        "TypeRig"
+      ],
+      "entrypoint": "Build_Hangul_Reference_Masks.py",
+      "files": [
+        "FL8 Scripts/Build_Hangul_Reference_Masks.py"
+      ]
+    },
+    {
+      "id": "build-palt-feature",
+      "name": "Build palt Feature",
+      "description": "palt 기능 생성",
+      "recommended_fontlab": "8.2+",
+      "target_python": "3.11",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
+      "requirements": [
+        "TypeRig"
+      ],
+      "entrypoint": "Build_palt_Feature.py",
+      "files": [
+        "FL8 Scripts/Build_palt_Feature.py"
+      ]
+    },
+    {
+      "id": "generate-shuffled-string",
+      "name": "Generate Shuffled String",
+      "description": "문자 순서를 섞은 문자열 생성",
+      "recommended_fontlab": "8.2+",
+      "target_python": "3.11",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
+      "requirements": [
+        "TypeRig"
+      ],
+      "entrypoint": "Generate_Shuffled_String.py",
+      "files": [
+        "FL8 Scripts/Generate_Shuffled_String.py"
+      ]
+    },
+    {
+      "id": "interpolate-side-bearings",
+      "name": "Interpolate Side Bearings",
+      "description": "사이드베어링 보간",
+      "recommended_fontlab": "8.2+",
+      "target_python": "3.11",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
+      "requirements": [
+        "TypeRig"
+      ],
+      "entrypoint": "Interpolate_Side_Bearings.py",
+      "files": [
+        "FL8 Scripts/Interpolate_Side_Bearings.py"
+      ]
+    },
+    {
+      "id": "smart-component-widget",
+      "name": "Smart Component Widget",
+      "description": "스마트 컴포넌트 편집 도구",
+      "recommended_fontlab": "8.2+",
+      "target_python": "3.11",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
+      "requirements": [
+        "TypeRig"
+      ],
+      "entrypoint": "Smart_Component_Widget.py",
+      "files": [
+        "FL8 Scripts/Smart_Component_Widget.py"
+      ]
+    },
+    {
+      "id": "sort-text-by-form",
+      "name": "Sort Text By Form",
+      "description": "문자열을 글자 형태에 따라 정렬",
+      "recommended_fontlab": "8.2+",
+      "target_python": "3.11",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
+      "requirements": [],
+      "entrypoint": "Sort_Text_by_Form.py",
+      "files": [
+        "FL8 Scripts/Sort_Text_by_Form.py"
+      ]
+    },
+    {
+      "id": "toolbox-utilities",
+      "name": "Toolbox Utilities",
+      "description": "FontLab 편집 유틸리티",
+      "recommended_fontlab": "8.2+",
+      "target_python": "3.11",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
+      "requirements": [
+        "TypeRig"
+      ],
+      "entrypoint": "Toolbox_Utilities.py",
+      "files": [
+        "FL8 Scripts/Toolbox_Utilities.py"
       ]
     }
   ]
