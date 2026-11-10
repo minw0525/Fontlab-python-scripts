@@ -23,7 +23,7 @@ yTop, yBottom = fontMetrics.ascender, fontMetrics.descender
 
 
 # init ====
-app_name, app_version = 'Minwoo | Projective Transform', '1.1'
+app_name, app_version = 'Minwoo | Projective Transform', '1.1.0'
 
 # Config ====
 column_names = ['Index', 'Character', 'Name', 'Unicode', 'Tags']

@@ -1,4 +1,4 @@
-#FLM: MW: Jitter Glyphs
+#FLM: MW: Wiggle Glyphs
 import math, random, warnings
 
 import fontlab as fl6
@@ -24,26 +24,31 @@ nT = fgt.fgNametable()
 yTop, yBottom = fontMetrics.ascender, fontMetrics.descender
 fontHeight = yTop - yBottom
 initialValues = {
-                'min_len': 10, 
-                'max_len': 80, 
-                'min_move_x': -20, 
-                'max_move_x': 20, 
-                'min_move_y': -20, 
-                'max_move_y': 20, 
-                'focus': 0,
-                'simplify': False,
-                'collapse': False,
-                'edge_effect_strength': 0 # New parameter
+                'components_count' : 3,
+                'weight_top': 80, 
+                'weight_bottom': 150, 
+                'wavelength_h_from': 30, 
+                'wavelength_h_to': 50, 
+                'wavelength_v_from': 30, 
+                'wavelength_v_to': 60, 
+                'amplitude_h_from': 3,
+                'amplitude_h_to': 10,
+                'amplitude_v_from': 3,
+                'amplitude_v_to': 10, 
+                'scale_h': 50, 
+                'scale_v': 100, 
+                'treshold': 30, 
+                'offset': 10, 
             }
 
 
 global pMode
 pMode = 0
-    # if mode == 0: [selected glyph]
-    # if mode == 1: [glyphs in edit window]
-    # if mode == 2: [selected glyphs in font window]
-    # if mode == 3: [all glyphs in font]
-
+	# if mode == 0: [selected glyph]
+	# if mode == 1: [glyphs in edit window]
+	# if mode == 2: [selected glyphs in font window]
+	# if mode == 3: [all glyphs in font]
+	
 table_draw_size = 130
 canvas_draw_size = 450
 
@@ -55,10 +60,10 @@ color_coral = QtGui.QColor('coral')
 
 
 # init ====
-app_name, app_version = 'Minwoo | Jitter Glyphs', '1.0'
+app_name, app_version = 'Minwoo | Wiggle Glyphs', '1.0.0'
 
 
-# Style Sheet ===
+# Style Sheet ====
 style = """
 QWidget {
     background-color: #202020;
@@ -357,10 +362,10 @@ class CustomSpinBox(QtGui.QSpinBox):
         # print(e, key)
         if key == QtCore.Qt.Key_Escape:
             self.clearFocus()
-        if key in [QtCore.Qt.Key_Up, QtCore.Qt.Key_Down] and (e.modifiers() & QtCore.Qt.ShiftModifier):
-            self.setSingleStep(10)
-        else:
-            self.setSingleStep(1)
+        # if key in [QtCore.Qt.Key_Up, QtCore.Qt.Key_Down] and (e.modifiers() & QtCore.Qt.ShiftModifier):
+        #     self.setSingleStep(10)
+        # else:
+        #     self.setSingleStep(1)
         QtGui.QSpinBox.keyPressEvent(self, e)
 
 
@@ -399,6 +404,7 @@ class PreviewCanvas(QtGui.QLabel):
 
 
 
+
 class MainWindow(QtGui.QWidget):
     def __init__(self):
         super(MainWindow, self).__init__()
@@ -407,8 +413,7 @@ class MainWindow(QtGui.QWidget):
         self.tempValues = False
         self.readPreference()
         self.showNode = False
-        self.simplify = self.inputValues.get('simplify', False)
-        self.collapse = self.inputValues.get('collapse', False)
+        self.simplify = True
         self.setData()
 
 
@@ -447,64 +452,129 @@ class MainWindow(QtGui.QWidget):
         self.preview_HBoxLayout.addWidget(self.preview_canvas)
         self.preview_GroupBox.setLayout(self.preview_HBoxLayout)
 
-        # -- Jitter Controls --
-        # Min/Max Length
-        self.edt_min_len = CustomSpinBox()
-        self.edt_min_len.setRange(1, 500)
-        self.edt_min_len.setValue(self.inputValues['min_len'])
-        self.edt_min_len.setAlignment(0x0002)
-        self.edt_min_len.setMaximumWidth(60)
-        self.edt_min_len.setSuffix('u')
+        # edit
+        self.edt_components_count = CustomSpinBox()
+        self.edt_components_count.setRange(0,10)	
+        self.edt_components_count.setValue(self.inputValues['components_count'])
+        self.edt_components_count.setAlignment(0x0002) #align-right
+        self.edt_components_count.setMaximumWidth(150)
+        
+        self.edt_weight_top = CustomSpinBox()
+        self.edt_weight_top.setRange(0,500)	
+        self.edt_weight_top.setValue(self.inputValues['weight_top'])
+        self.edt_weight_top.setAlignment(0x0002) #align-right
+        self.edt_weight_top.setMaximumWidth(150)
+        self.edt_weight_top.setSuffix('%')
 
-        self.edt_max_len = CustomSpinBox()
-        self.edt_max_len.setRange(1, 500)
-        self.edt_max_len.setValue(self.inputValues['max_len'])
-        self.edt_max_len.setAlignment(0x0002)
-        self.edt_max_len.setMaximumWidth(60)
-        self.edt_max_len.setSuffix('u')
+        self.edt_weight_bottom = CustomSpinBox()
+        self.edt_weight_bottom.setRange(0,500)	
+        self.edt_weight_bottom.setValue(self.inputValues['weight_bottom'])
+        self.edt_weight_bottom.setAlignment(0x0002)
+        self.edt_weight_bottom.setMaximumWidth(150)
+        self.edt_weight_bottom.setSuffix('%')
 
-        # Min/Max Move X
-        self.edt_min_move_x = CustomSpinBox()
-        self.edt_min_move_x.setRange(-500, 500)
-        self.edt_min_move_x.setValue(self.inputValues['min_move_x'])
-        self.edt_min_move_x.setAlignment(0x0002)
-        self.edt_min_move_x.setMaximumWidth(60)
+        self.edt_wavelength_h_from = CustomSpinBox()
+        self.edt_wavelength_h_from.setRange(0,500)	
+        self.edt_wavelength_h_from.setValue(self.inputValues['wavelength_h_from'])
+        self.edt_wavelength_h_from.setAlignment(0x0002) #align-right
+        self.edt_wavelength_h_from.setMaximumWidth(60)
+        self.edt_wavelength_h_from.setSuffix('u')
 
-        self.edt_max_move_x = CustomSpinBox()
-        self.edt_max_move_x.setRange(-500, 500)
-        self.edt_max_move_x.setValue(self.inputValues['max_move_x'])
-        self.edt_max_move_x.setAlignment(0x0002)
-        self.edt_max_move_x.setMaximumWidth(60)
+        self.edt_wavelength_h_to = CustomSpinBox()
+        self.edt_wavelength_h_to.setRange(0,500)	
+        self.edt_wavelength_h_to.setValue(self.inputValues['wavelength_h_to'])
+        self.edt_wavelength_h_to.setAlignment(0x0002) #align-right
+        self.edt_wavelength_h_to.setMaximumWidth(60)
+        self.edt_wavelength_h_to.setSuffix('u')
 
-        # Min/Max Move Y
-        self.edt_min_move_y = CustomSpinBox()
-        self.edt_min_move_y.setRange(-500, 500)
-        self.edt_min_move_y.setValue(self.inputValues['min_move_y'])
-        self.edt_min_move_y.setAlignment(0x0002)
-        self.edt_min_move_y.setMaximumWidth(60)
+        self.edt_wavelength_v_from = CustomSpinBox()
+        self.edt_wavelength_v_from.setRange(0,500)	
+        self.edt_wavelength_v_from.setValue(self.inputValues['wavelength_v_from'])
+        self.edt_wavelength_v_from.setAlignment(0x0002)
+        self.edt_wavelength_v_from.setMaximumWidth(60)
+        self.edt_wavelength_v_from.setSuffix('u')
 
-        self.edt_max_move_y = CustomSpinBox()
-        self.edt_max_move_y.setRange(-500, 500)
-        self.edt_max_move_y.setValue(self.inputValues['max_move_y'])
-        self.edt_max_move_y.setAlignment(0x0002)
-        self.edt_max_move_y.setMaximumWidth(60)
+        self.edt_wavelength_v_to = CustomSpinBox()
+        self.edt_wavelength_v_to.setRange(0,500)	
+        self.edt_wavelength_v_to.setValue(self.inputValues['wavelength_v_to'])
+        self.edt_wavelength_v_to.setAlignment(0x0002)
+        self.edt_wavelength_v_to.setMaximumWidth(60)
+        self.edt_wavelength_v_to.setSuffix('u')
 
-        # Focus
-        self.edt_focus = CustomSpinBox()
-        self.edt_focus.setRange(-300, 300)
-        self.edt_focus.setValue(self.inputValues['focus'])
-        self.edt_focus.setAlignment(0x0002)
-        self.edt_focus.setMaximumWidth(150)
-        self.edt_focus.setSuffix('%')
+        self.edt_amplitude_h_from = CustomSpinBox()
+        self.edt_amplitude_h_from.setRange(0,500)	
+        self.edt_amplitude_h_from.setValue(self.inputValues['amplitude_h_from'])
+        self.edt_amplitude_h_from.setAlignment(0x0002)
+        self.edt_amplitude_h_from.setMaximumWidth(60)
+
+        self.edt_amplitude_h_to = CustomSpinBox()
+        self.edt_amplitude_h_to.setRange(0,500)	
+        self.edt_amplitude_h_to.setValue(self.inputValues['amplitude_h_to'])
+        self.edt_amplitude_h_to.setAlignment(0x0002)
+        self.edt_amplitude_h_to.setMaximumWidth(60)
+
+        self.edt_amplitude_v_from = CustomSpinBox()
+        self.edt_amplitude_v_from.setRange(0,500)	
+        self.edt_amplitude_v_from.setValue(self.inputValues['amplitude_v_from'])
+        self.edt_amplitude_v_from.setAlignment(0x0002)
+        self.edt_amplitude_v_from.setMaximumWidth(60)
+
+        self.edt_amplitude_v_to = CustomSpinBox()
+        self.edt_amplitude_v_to.setRange(0,500)	
+        self.edt_amplitude_v_to.setValue(self.inputValues['amplitude_v_to'])
+        self.edt_amplitude_v_to.setAlignment(0x0002)
+        self.edt_amplitude_v_to.setMaximumWidth(60)
+
+        self.edt_scale_h = CustomSpinBox()
+        self.edt_scale_h.setRange(0,300)	
+        self.edt_scale_h.setValue(self.inputValues['scale_h'])
+        self.edt_scale_h.setAlignment(0x0002)
+        self.edt_scale_h.setMaximumWidth(150)
+        self.edt_scale_h.setSuffix('%')
+
+        self.edt_scale_v = CustomSpinBox()
+        self.edt_scale_v.setRange(0,300)	
+        self.edt_scale_v.setValue(self.inputValues['scale_v'])
+        self.edt_scale_v.setAlignment(0x0002)
+        self.edt_scale_v.setMaximumWidth(150)
+        self.edt_scale_v.setSuffix('%')
+
+        self.edt_treshold = CustomSpinBox()
+        self.edt_treshold.setRange(0,100)	
+        self.edt_treshold.setValue(self.inputValues['treshold'])
+        self.edt_treshold.setAlignment(0x0002)
+        self.edt_treshold.setMaximumWidth(150)
+        self.edt_treshold.setSuffix('u')
+
+        self.edt_offset = CustomSpinBox()
+        self.edt_offset.setRange(0,100)	
+        self.edt_offset.setValue(self.inputValues['offset'])
+        self.edt_offset.setAlignment(0x0002)
+        self.edt_offset.setMaximumWidth(150)
+
 
         self.btn_reset = CustomBtn('↺')
         self.btn_transform = CustomBtn('Transform')
 
-        # Labels
-        self.lbl_segment_len = QtGui.QLabel('Segment Length')
-        self.lbl_move_x = QtGui.QLabel('Move X')
-        self.lbl_move_y = QtGui.QLabel('Move Y')
-        self.lbl_focus = QtGui.QLabel('Focus')
+        # labels
+        self.lbl_components_count = QtGui.QLabel('Sine Count')
+
+        self.lbl_weight_top = QtGui.QLabel('Weight-Top')
+        self.lbl_weight_bottom = QtGui.QLabel('Weight-Bottom')
+
+        self.lbl_wavelength_h = QtGui.QLabel('Wavelength-H')
+        self.lbl_wavelength_v = QtGui.QLabel('Wavelength-V')
+
+        self.lbl_amplitude_h = QtGui.QLabel('Amplitude-H')
+        self.lbl_amplitude_v = QtGui.QLabel('Amplitude-V')
+
+        self.lbl_scale_h = QtGui.QLabel('Scale-H')
+        self.lbl_scale_v = QtGui.QLabel('Scale-V')
+
+        self.lbl_treshold = QtGui.QLabel('Treshold')
+
+        self.lbl_offset = QtGui.QLabel('Offset')
+
 
         self.input_GroupBox = QtGui.QGroupBox()
         self.input_GridLayout = QtGui.QGridLayout()
@@ -512,39 +582,43 @@ class MainWindow(QtGui.QWidget):
         self.btn_reset.setStyleSheet('border: 1px solid #5E5E5E;')
         self.btn_transform.setStyleSheet('border: 1px solid #5E5E5E;')
 
-        # Layout
-        self.input_GridLayout.addWidget(self.lbl_segment_len, 0, 0, 1, 2)
-        self.input_GridLayout.addWidget(self.edt_min_len, 0, 2, 1, 1)
-        self.input_GridLayout.addWidget(self.edt_max_len, 0, 3, 1, 1)
+#       QGridLayout.addWidget(widget, fromRow, fromCol, rowSpan, colSpan)
+        self.input_GridLayout.addWidget(self.lbl_components_count,  0,  0,  1,  2)
+        self.input_GridLayout.addWidget(self.edt_components_count,  0,  2,  1,  2)
 
-        self.input_GridLayout.addWidget(self.lbl_move_x, 1, 0, 1, 2)
-        self.input_GridLayout.addWidget(self.edt_min_move_x, 1, 2, 1, 1)
-        self.input_GridLayout.addWidget(self.edt_max_move_x, 1, 3, 1, 1)
+        self.input_GridLayout.addWidget(self.lbl_weight_top,        1,  0,  1,  2)
+        self.input_GridLayout.addWidget(self.edt_weight_top,        1,  2,  1,  2)
+        self.input_GridLayout.addWidget(self.lbl_weight_bottom,     2,  0,  1,  1)
+        self.input_GridLayout.addWidget(self.edt_weight_bottom,     2,  2,  1,  2)
 
-        self.input_GridLayout.addWidget(self.lbl_move_y, 2, 0, 1, 2)
-        self.input_GridLayout.addWidget(self.edt_min_move_y, 2, 2, 1, 1)
-        self.input_GridLayout.addWidget(self.edt_max_move_y, 2, 3, 1, 1)
-        
-        self.input_GridLayout.addWidget(self.lbl_focus, 3, 0, 1, 2)
-        self.input_GridLayout.addWidget(self.edt_focus, 3, 2, 1, 2)
+        self.input_GridLayout.addWidget(self.lbl_wavelength_h,      3,  0,  1,  2)
+        self.input_GridLayout.addWidget(self.edt_wavelength_h_from, 3,  2,  1,  1)
+        self.input_GridLayout.addWidget(self.edt_wavelength_h_to,   3,  3,  1,  1)
+        self.input_GridLayout.addWidget(self.lbl_wavelength_v,      4,  0,  1,  2)
+        self.input_GridLayout.addWidget(self.edt_wavelength_v_from, 4,  2,  1,  1)
+        self.input_GridLayout.addWidget(self.edt_wavelength_v_to,   4,  3,  1,  1)
+                
+        self.input_GridLayout.addWidget(self.lbl_amplitude_h,       5,  0,  1,  2)
+        self.input_GridLayout.addWidget(self.edt_amplitude_h_from,  5,  2,  1,  1)
+        self.input_GridLayout.addWidget(self.edt_amplitude_h_to,    5,  3,  1,  1)
+        self.input_GridLayout.addWidget(self.lbl_amplitude_v,       6,  0,  1,  2)
+        self.input_GridLayout.addWidget(self.edt_amplitude_v_from,  6,  2,  1,  1)
+        self.input_GridLayout.addWidget(self.edt_amplitude_v_to,    6,  3,  1,  1)
 
-        self.lbl_edge_effect = QtGui.QLabel('Edge Effect')
-        self.edt_edge_effect = CustomSpinBox()
-        self.edt_edge_effect.setRange(0, 100)
-        self.edt_edge_effect.setValue(self.inputValues.get('edge_effect_strength', 0))
-        self.edt_edge_effect.setAlignment(0x0002)
-        self.edt_edge_effect.setMaximumWidth(60)
-        self.edt_edge_effect.setSuffix('%')
+        self.input_GridLayout.addWidget(self.lbl_scale_h,           7,  0,  1,  2)
+        self.input_GridLayout.addWidget(self.edt_scale_h,           7,  2,  1,  2)
 
-        self.input_GridLayout.addWidget(self.lbl_edge_effect, 4, 0, 1, 2)
-        self.input_GridLayout.addWidget(self.edt_edge_effect, 4, 2, 1, 1)
+        self.input_GridLayout.addWidget(self.lbl_scale_v,           8,  0,  1,  2)
+        self.input_GridLayout.addWidget(self.edt_scale_v,           8,  2,  1,  2)
 
-        # Add spacer to push controls to the top
-        self.input_GridLayout.addItem(QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding), 5, 0)
+        self.input_GridLayout.addWidget(self.lbl_treshold,          9,  0,  1,  2)
+        self.input_GridLayout.addWidget(self.edt_treshold,          9,  2,  1,  2)
 
+        self.input_GridLayout.addWidget(self.lbl_offset,            10, 0,  1,  2)
+        self.input_GridLayout.addWidget(self.edt_offset,            10, 2,  1,  2)
 
-        self.input_GridLayout.addWidget(self.btn_transform, 11, 0, 1, 3)
-        self.input_GridLayout.addWidget(self.btn_reset, 11, 3, 1, 1)
+        self.input_GridLayout.addWidget(self.btn_transform,         11, 0,  1,  3)
+        self.input_GridLayout.addWidget(self.btn_reset,             11, 3,  1,  1)
 
         self.input_GroupBox.setLayout(self.input_GridLayout)
         self.original_HBoxLayout.addWidget(self.input_GroupBox)
@@ -553,10 +627,7 @@ class MainWindow(QtGui.QWidget):
         self.chk_showNode = QtGui.QCheckBox('Show Nodes')
         self.chk_showNode.setChecked(self.showNode)
         self.chk_showNode.setFocusPolicy(QtCore.Qt.NoFocus)
-        self.btn_collapse = CustomBtn('Collapse')
-        self.btn_collapse.setCheckable(True)
-        self.btn_collapse.setChecked(self.collapse)
-        self.btn_simplify = CustomBtn('Simplify')
+        self.btn_simplify = CustomBtn('Simplify On')
         self.btn_simplify.setCheckable(True)
         self.btn_simplify.setChecked(self.simplify)
         self.btn_apply = CustomBtn('Apply')
@@ -565,8 +636,7 @@ class MainWindow(QtGui.QWidget):
         self.footer_Widget = QtGui.QWidget()
         self.footer_GridLayout = QtGui.QGridLayout()
         self.footer_GridLayout.addWidget(self.chk_showNode, 0, 0, 1, 1, QtCore.Qt.AlignTop)
-        self.footer_GridLayout.addItem(self.hSpacer300,     0, 1, 1, 2)
-        self.footer_GridLayout.addWidget(self.btn_collapse, 0, 3, 1, 1)
+        self.footer_GridLayout.addItem(self.hSpacer300,     0, 1, 1, 3)
         self.footer_GridLayout.addWidget(self.btn_simplify, 0, 4, 1, 1)
         self.footer_GridLayout.addWidget(self.btn_apply,    0, 5, 1, 1)
         self.footer_GridLayout.addWidget(self.btn_close,    0, 6, 1, 1)
@@ -585,20 +655,24 @@ class MainWindow(QtGui.QWidget):
         # slots
         self.btn_prevGlyph.clicked.connect(self.prevClicked)
         self.btn_nextGlyph.clicked.connect(self.nextClicked)
-        
-        self.edt_min_len.editingFinished.connect(lambda: self.spinboxChanged(self.edt_min_len, 'min_len'))
-        self.edt_max_len.editingFinished.connect(lambda: self.spinboxChanged(self.edt_max_len, 'max_len'))
-        self.edt_min_move_x.editingFinished.connect(lambda: self.spinboxChanged(self.edt_min_move_x, 'min_move_x'))
-        self.edt_max_move_x.editingFinished.connect(lambda: self.spinboxChanged(self.edt_max_move_x, 'max_move_x'))
-        self.edt_min_move_y.editingFinished.connect(lambda: self.spinboxChanged(self.edt_min_move_y, 'min_move_y'))
-        self.edt_max_move_y.editingFinished.connect(lambda: self.spinboxChanged(self.edt_max_move_y, 'max_move_y'))
-        self.edt_focus.editingFinished.connect(lambda: self.spinboxChanged(self.edt_focus, 'focus'))
-        self.edt_edge_effect.editingFinished.connect(lambda: self.spinboxChanged(self.edt_edge_effect, 'edge_effect_strength'))
-
+        self.edt_components_count.editingFinished.connect(lambda sender = self.edt_components_count, value = 'components_count': self.spinboxChanged(sender, value))
+        self.edt_weight_top.editingFinished.connect(lambda sender = self.edt_weight_top, value = 'weight_top': self.spinboxChanged(sender, value))
+        self.edt_weight_bottom.editingFinished.connect(lambda sender = self.edt_weight_bottom, value = 'weight_bottom': self.spinboxChanged(sender, value))
+        self.edt_wavelength_h_from.editingFinished.connect(lambda sender = self.edt_wavelength_h_from, value = 'wavelength_h_from': self.spinboxChanged(sender, value))
+        self.edt_wavelength_h_to.editingFinished.connect(lambda sender = self.edt_wavelength_h_to, value = 'wavelength_h_to': self.spinboxChanged(sender, value))
+        self.edt_wavelength_v_from.editingFinished.connect(lambda sender = self.edt_wavelength_v_from, value = 'wavelength_v_from': self.spinboxChanged(sender, value))
+        self.edt_wavelength_v_to.editingFinished.connect(lambda sender = self.edt_wavelength_v_to, value = 'wavelength_v_to': self.spinboxChanged(sender, value))
+        self.edt_amplitude_h_from.editingFinished.connect(lambda sender = self.edt_amplitude_h_from, value = 'amplitude_h_from': self.spinboxChanged(sender, value))
+        self.edt_amplitude_h_to.editingFinished.connect(lambda sender = self.edt_amplitude_h_to, value = 'amplitude_h_to': self.spinboxChanged(sender, value))
+        self.edt_amplitude_v_from.editingFinished.connect(lambda sender = self.edt_amplitude_v_from, value = 'amplitude_v_from': self.spinboxChanged(sender, value))
+        self.edt_amplitude_v_to.editingFinished.connect(lambda sender = self.edt_amplitude_v_to, value = 'amplitude_v_to': self.spinboxChanged(sender, value))
+        self.edt_scale_h.editingFinished.connect(lambda sender = self.edt_scale_h, value = 'scale_h': self.spinboxChanged(sender, value))
+        self.edt_scale_v.editingFinished.connect(lambda sender = self.edt_scale_v, value = 'scale_v': self.spinboxChanged(sender, value))
+        self.edt_treshold.editingFinished.connect(lambda sender = self.edt_treshold, value = 'treshold': self.spinboxChanged(sender, value))
+        self.edt_offset.editingFinished.connect(lambda sender = self.edt_offset, value = 'offset': self.spinboxChanged(sender, value))
         self.btn_reset.clicked.connect(self.resetValue)
         self.btn_transform.clicked.connect(self.add_tableItem)
         self.chk_showNode.clicked.connect(self.toggle_nodeVisibility)
-        self.btn_collapse.toggled.connect(self.toggle_collapse)
         self.btn_simplify.toggled.connect(self.toggle_simplify)
         self.btn_apply.clicked.connect(self.apply_transform)
         self.btn_close.clicked.connect(self.closeWidget)
@@ -608,7 +682,7 @@ class MainWindow(QtGui.QWidget):
         self.setStyleSheet(style)
         self.header_Widget.setStyleSheet(style)
         self.footer_Widget.setStyleSheet(style)
-        self.setWindowTitle(f'{app_name} {app_version}')
+        self.setWindowTitle('%s %s' %(app_name, app_version))
         self.setGeometry(300, 100, 1450, 630)
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
         self.setFocus()
@@ -618,8 +692,6 @@ class MainWindow(QtGui.QWidget):
         self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
         qapp.applicationStateChanged.connect(self.setFlag)
         self.show()
-        self.toggle_collapse()
-        self.toggle_simplify()
 
 
     def prevClicked(self): 
@@ -648,17 +720,10 @@ class MainWindow(QtGui.QWidget):
         self.original_canvas.pixmaps_refresh()
         self.preview_canvas.pixmaps_refresh()
 
-    def toggle_collapse(self):
-        self.collapse = self.btn_collapse.isChecked()
-        onoff = "On" if self.collapse else "Off"
-        self.btn_collapse.setText(f'Collapse {onoff}')
-        self.inputValues['collapse'] = self.collapse # Save state
-
     def toggle_simplify(self):
         self.simplify = self.btn_simplify.isChecked()
         onoff = "On" if self.simplify else "Off"
         self.btn_simplify.setText(f'Simplify {onoff}')
-        self.inputValues['simplify'] = self.simplify # Save state to inputValues
 
 
     def spinboxChanged(self, sender, value): 
@@ -678,14 +743,21 @@ class MainWindow(QtGui.QWidget):
         else :
             self.tempValues = {**self.inputValues}
             self.inputValues = initialValues
-        
-        self.edt_min_len.setValue(self.inputValues['min_len'])
-        self.edt_max_len.setValue(self.inputValues['max_len'])
-        self.edt_min_move_x.setValue(self.inputValues['min_move_x'])
-        self.edt_max_move_x.setValue(self.inputValues['max_move_x'])
-        self.edt_min_move_y.setValue(self.inputValues['min_move_y'])
-        self.edt_max_move_y.setValue(self.inputValues['max_move_y'])
-        self.edt_focus.setValue(self.inputValues['focus'])
+        self.edt_components_count.setValue(self.inputValues['components_count'])
+        self.edt_weight_top.setValue(self.inputValues['weight_top'])
+        self.edt_weight_bottom.setValue(self.inputValues['weight_bottom'])
+        self.edt_wavelength_h_from.setValue(self.inputValues['wavelength_h_from'])
+        self.edt_wavelength_h_to.setValue(self.inputValues['wavelength_h_to'])
+        self.edt_wavelength_v_from.setValue(self.inputValues['wavelength_v_from'])
+        self.edt_wavelength_v_to.setValue(self.inputValues['wavelength_v_to'])
+        self.edt_amplitude_h_from.setValue(self.inputValues['amplitude_h_from'])
+        self.edt_amplitude_h_to.setValue(self.inputValues['amplitude_h_to'])
+        self.edt_amplitude_v_from.setValue(self.inputValues['amplitude_v_from'])
+        self.edt_amplitude_v_to.setValue(self.inputValues['amplitude_v_to'])
+        self.edt_scale_h.setValue(self.inputValues['scale_h'])
+        self.edt_scale_v.setValue(self.inputValues['scale_v'])
+        self.edt_treshold.setValue(self.inputValues['treshold'])
+        self.edt_offset.setValue(self.inputValues['offset'])
 
 
     def add_tableItem(self):
@@ -758,7 +830,7 @@ class MainWindow(QtGui.QWidget):
             self.setWindowFlags(self.windowFlags() | QtCore.Qt.WindowStaysOnTopHint)
         else:
             self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowStaysOnTopHint)
-        self.show()
+        self.show();
     
     def closeEvent(self, event):
         qapp.applicationStateChanged.disconnect(self.setFlag)
@@ -782,129 +854,169 @@ class MainWindow(QtGui.QWidget):
         self.refresh()
 
 
-    def subdivide_contour(self, contour):
-        min_len = self.inputValues['min_len']
-        max_len = self.inputValues['max_len']
+    def interpolate(self, treshold):
 
-        if max_len <= min_len:
-            max_len = min_len + 1
-        if min_len <= 0:
-            min_len = 1
-
-        # Per user instruction, this line is omitted.
-
-        iterations = 0
-        max_iterations = 5000 
-
-        while iterations < max_iterations:
-            was_split = False
-            for i in range(len(contour.segments())):
-                segment = contour.segments()[i]
-                
-                # Use fastLength as requested by user
-                if segment.fastLength() > max_len:
-                    # Segment is too long. Split it at a random point.
-                    # Use a Gaussian distribution to make splits closer to the midpoint more likely.
-                    # mu=0.5 (midpoint), sigma=0.1 makes it favor the center but allows some variation.
-                    split_point = random.gauss(0.5, 0.1)
-                    # Clamp to avoid splitting too close to the ends of the segment
-                    split_point = max(0.1, min(0.9, split_point))
-
-                    contour.insertNodeTo(i + split_point)
-                    
-                    was_split = True
-                    # Break from the for loop and restart the while loop
-                    # to get a fresh list of segments.
-                    break
-            
-            if not was_split:
-                # If we went through the whole contour and didn't split anything, we're done.
-                break
-            
-            iterations += 1
-
-        if iterations >= max_iterations:
-            warnings.warn("Jitter: Max iterations reached in subdivide_contour. Contour may not be fully subdivided.")
-
-    def jitter_nodes(self, contours):
-        min_x = self.inputValues['min_move_x']
-        max_x = self.inputValues['max_move_x']
-        min_y = self.inputValues['min_move_y']
-        max_y = self.inputValues['max_move_y']
-        focus = self.inputValues['focus']
-
-        mu_x = (min_x + max_x) / 2
-        mu_y = (min_y + max_y) / 2
-
-        # Calculate sigma based on absolute focus value
-        abs_focus = abs(focus)
-        focus_divisor = 6 * (abs_focus / 100.0)
-        if focus_divisor == 0:
-            focus_divisor = 0.01 # Prevent division by zero
-
-        sigma_x = (max_x - min_x) / focus_divisor if max_x > min_x else 0
-        sigma_y = (max_y - min_y) / focus_divisor if max_y > min_y else 0
-
-        for contour in contours:
+        self.timeTable = self.glyph.mapTimes2Nodes()
+        cloned_contours = [contour.clone() for contour in self.originalContours]
+        for contour in cloned_contours:
             for node in contour.nodes():
-                if focus >= 0: # Normal bell curve distribution
-                    dx = random.gauss(mu_x, sigma_x) if sigma_x > 0 else mu_x
-                    dy = random.gauss(mu_y, sigma_y) if sigma_y > 0 else mu_y
-                else: # Inverted bell curve (U-shaped) distribution
-                    # Generate two uniform random numbers and pick the one further from the mean
-                    # This creates a U-shaped distribution
-                    r1_x = random.uniform(min_x, max_x)
-                    r2_x = random.uniform(min_x, max_x)
-                    dx = r1_x if abs(r1_x - mu_x) > abs(r2_x - mu_x) else r2_x
+                if node.isCurve(): 
+                    continue
+                else:
+                    node.convertToCurve()
 
-                    r1_y = random.uniform(min_y, max_y)
-                    r2_y = random.uniform(min_y, max_y)
-                    dy = r1_y if abs(r1_y - mu_y) > abs(r2_y - mu_y) else r2_y
-
-                # Clamp the values to the min/max range to avoid extreme outliers
-                dx = max(min_x, min(max_x, dx))
-                dy = max(min_y, min(max_y, dy))
-
-                # Apply edge effect
-                multiplier = 1.0
-                edge_effect_strength = self.inputValues.get('edge_effect_strength', 0)
-                if edge_effect_strength > 0:
-                    center_x = (self.xmin + self.xmax) / 2
-                    center_y = (yTop + yBottom) / 2
-                    width = self.xmax - self.xmin
-                    height = yTop - yBottom
-
-                    # Avoid division by zero if glyph has zero width/height
-                    if width == 0: width = 1
-                    if height == 0: height = 1
-
-                    norm_x = abs(node.x - center_x) / (width / 2)
-                    norm_y = abs(node.y - center_y) / (height / 2)
-                    
-                    radial_norm_dist = math.sqrt(norm_x**2 + norm_y**2)
-                    radial_norm_dist = min(radial_norm_dist, 1.0) # Clamp to 1.0
-
-                    multiplier = 1.0 + (radial_norm_dist * (edge_effect_strength / 100.0))
-
-                node.x += dx * multiplier
-                node.y += dy * multiplier
-            
-            if self.simplify:
-                contour.simplify(1, True, True)
+        for [cID, contour] in zip(self.timeTable.keys(), cloned_contours):
+            self.splitUntil(cID, contour, cloned_contours, treshold)
         
+        return cloned_contours
+
+    #Split segment
+    def splitUntil(self, cID, contour, all_contours, treshold):
+
+        #segment[0]: CurveEx, segment[1]: flNodes
+        prev = [[segmentIdx, segment] for [segmentIdx, segment] in zip(self.timeTable[cID], contour.segments())]
+        # print('PREV', prev)
+
+        while(len(prev)) > 0 :
+
+            currSeg =  prev.pop()
+            # print("CURRSEG",currSeg)
+            if currSeg[1].fastLength() > treshold : 
+                
+                contour.insertNodeTo(currSeg[0] + .5)
+
+
+                contourMap = {}		
+                
+                nodeMap = {}
+                countOn = -1
+
+                for node in contour.nodes():
+                    countOn += node.isOn() # Hack-ish but working
+                    nodeMap[node.index] = countOn
+                    
+                contourMap[all_contours.index(contour)] = nodeMap
+
+                t2nMap = {}
+
+                for cID, nodeMap in contourMap.items():
+                    tempMap = {}
+                    
+                    for nID, time in nodeMap.items():
+                        tempMap.setdefault(time, []).append(nID)
+
+                    t2nMap[cID] = tempMap
+
+                timeTable = t2nMap
+                prev = [[segmentIdx, segment] for [segmentIdx, segment] in zip(timeTable[cID], contour.segments())]
+
+    def transform(self, contours, transformers, isRandom=False):
+        # cloned_nodes = [node.clone() for node in self.glyph.nodes()]
+
+        # if not isRandom:
+        #     for node in cloned_nodes:
+        #         x = node.x
+        #         y = node.y
+        #         WAVELENGTH = [self.inputValues['wavelength_h'], self.inputValues['wavelength_h']]
+        #         OFFSET = [self.inputValues['offset']]
+        #         newPts = transformers(x, y, WAVELENGTH, OFFSET)
+        #         node.x, node.y = newPts[0], newPts[1]
+        #     return cloned_nodes
+        WAVELENGTH_H = [self.inputValues['wavelength_h_from'], self.inputValues['wavelength_h_to']]
+        WAVELENGTH_V = [self.inputValues['wavelength_v_from'], self.inputValues['wavelength_v_to']]
+        AMPLITUDE_H = [self.inputValues['amplitude_h_from'], self.inputValues['amplitude_h_to']]
+        AMPLITUDE_V = [self.inputValues['amplitude_v_from'], self.inputValues['amplitude_v_to']]
+        #     return cloned_nodes
+
+        COMPONENTS_COUNT = self.inputValues['components_count']
+        
+        for contour in contours:
+
+            RANDOM_AMPLITUDE_H = [random.uniform(AMPLITUDE_H[0], AMPLITUDE_H[1]) for i in range(COMPONENTS_COUNT)]
+            RANDOM_AMPLITUDE_V = [random.uniform(AMPLITUDE_V[0], AMPLITUDE_V[1]) for i in range(COMPONENTS_COUNT)]
+            RANDOM_WAVELENGTH_H = [random.uniform(WAVELENGTH_H[0], WAVELENGTH_H[1]) * random.choice([-1, 1]) for i in range(COMPONENTS_COUNT)]
+            RANDOM_WAVELENGTH_V = [random.uniform(WAVELENGTH_V[0], WAVELENGTH_V[1]) * random.choice([-1, 1]) for i in range(COMPONENTS_COUNT)]
+            CONTOUR_RECT = contour.boundingBox()
+
+            wave_params = [[RANDOM_AMPLITUDE_H, RANDOM_AMPLITUDE_V], [RANDOM_WAVELENGTH_H, RANDOM_WAVELENGTH_V], CONTOUR_RECT]
+            for i in range(COMPONENTS_COUNT):
+                for node in contour.nodes():
+                    x = node.x
+                    y = node.y
+                    newPts = transformers(x, y, i, wave_params)
+                    node.x, node.y = newPts[0], newPts[1]
+
+            if self.simplify:
+                contour.simplify(1, True, True)  
+                
         return contours
+        # self.glyph.updateObject(self.glyph.fl, 'Glyph modified')
+
+    
+    # def uniformSineTransformer(self, x, y, waveLength, offset):
+    #     return [
+    #         x + offset * math.sin(y / waveLength[0]) * self.inputValues['scale_h'],
+    #         y + offset * math.sin(x / waveLength[1]) * self.inputValues['scale_v']
+    #     ]
+
+    def randomSineTransformer(self, x, y, randomCounter, wave_params):
+        WEIGHT_TOP = self.inputValues['weight_top'] / 100
+        WEIGHT_BOTTOM = self.inputValues['weight_bottom'] / 100
+        SCALE_H = self.inputValues['scale_h'] / 100
+        SCALE_V = self.inputValues['scale_v'] / 100
+        OFFSET = self.inputValues['offset']
+        COMPONENTS_COUNT = self.inputValues['components_count']
+
+        A = wave_params[0] #Amplitude
+        W = wave_params[1] #Wavelength
+        R = wave_params[2] #Rect_weight
+        
+        # a = ( WEIGHT_TOP - WEIGHT_BOTTOM) / R.height()  # ( 0.8 - 1.5 ) * 300 = -210   /// -0.7*500 = -350 
+        # a2 = ( WEIGHT_TOP - WEIGHT_BOTTOM) / (fontHeight - y)  
+        # b = WEIGHT_TOP - (WEIGHT_TOP - WEIGHT_BOTTOM) / R.height() * R.bottom() # 0.8525) 
+        # b2 = WEIGHT_TOP - (WEIGHT_TOP - WEIGHT_BOTTOM) / fontHeight * y
+
+        # # print(a, a2, b, b2)
+        # # weight_v_ratio = a * y + b
+        # print(f'({a},{a2},{a*a2}), {y}, ({b},{b2},{b*b2})')
+        # weight_v_ratio = (a/6 + a2/5)* 4 * y + (b/6 + b2/5)*4
+       
+        a = (WEIGHT_TOP * ((y - R.top()) / R.height())) + WEIGHT_BOTTOM * ((R.bottom() - y) / R.height())
+        b = (WEIGHT_TOP ** 2.5 * ((y - yBottom) / fontHeight) + WEIGHT_BOTTOM ** 2.5 *   ((yTop - y) / fontHeight))
+        # weight_v_ratio = (a * a2)/4 * y + (b * b2)/4
+
+        weight_v_ratio = a * b / COMPONENTS_COUNT
+#         print(f'''a : {a}, 
+# b : {b}, 
+# y : {y}, 
+# COMPONENTS_COUNT : {COMPONENTS_COUNT},
+# weight_v_ratio: {weight_v_ratio}''')
+        x_weight = (R.right() - x) / R.width()
+        W_weight = (R.bottom() - y) / R.height()
+
+        offset_x = OFFSET * (self.xmax - x) / self.adv 
+        offset_y = OFFSET * (yTop - y) / fontHeight 
+
+        
+        #컨투어 안에서 높이별 진폭 가중치 / 주파수 감산치 줄 수 있을지 고민해보기
+
+        # return [
+        #     x + A[0][randomCounter] * math.sin(y / W[0][randomCounter]-offset_weight_x) * SCALE_H,
+        #     y + (A[1][randomCounter] * math.sin(x / W[1][randomCounter]-offset_weight_y) * SCALE_V) * transformation_weight
+        # ]
+
+        return [
+            x + A[0][randomCounter] * math.sin(y / W[0][randomCounter]-offset_x) * SCALE_H,
+            # y + A[1][randomCounter] * math.sin(x / W[1][randomCounter] * weight_v_ratio - offset_y) * SCALE_V * weight_v_ratio
+            y + signInt( math.sin(x / W[1][randomCounter] - offset_y) ) * A[1][randomCounter] * abs(math.sin(x / W[1][randomCounter] - offset_y)) * SCALE_V * weight_v_ratio
+        ]
+       
 
     def getProcessedContours(self):
-        cloned_contours = [c.clone() for c in self.originalContours]
-        
-        for contour in cloned_contours:
-            self.subdivide_contour(contour)
-            if self.collapse:
-                for node in contour.nodes():
-                    node.collapseHandles()
-
-        return_contours = self.jitter_nodes(cloned_contours)
-        return return_contours
+        TRESHOLD = self.inputValues['treshold']      
+        interpolatedContours = self.interpolate(TRESHOLD)
+        return_contour = self.transform(interpolatedContours, self.randomSineTransformer, True)
+        return return_contour
     
     def drawCanvas(self, contours):     
 
@@ -1017,19 +1129,18 @@ class MainWindow(QtGui.QWidget):
             newMaskLayer.addShape(shape.cloneTopLevel())
 
     def writePreference(self):
-        new_packageLib = {**flP.packageLib, "com.Minwoo.JitterGlyphs": self.inputValues}
+        new_packageLib = {**flP.packageLib, "com.Minwoo.WiggleGlyphs": self.inputValues}
         flP.packageLib = new_packageLib
 
     def readPreference(self):
         self.inputValues = {}
         try:
-            self.inputValues = flP.packageLib["com.Minwoo.JitterGlyphs"]
+            self.inputValues = flP.packageLib["com.Minwoo.WiggleGlyphs"]
         except KeyError :
             self.inputValues = initialValues
-            NEW_INPUT_VALUE_PRESET = {**flP.packageLib, "com.Minwoo.JitterGlyphs": initialValues}
+            NEW_INPUT_VALUE_PRESET = {**flP.packageLib, "com.Minwoo.WiggleGlyphs": initialValues}
             flP.packageLib = NEW_INPUT_VALUE_PRESET
 
 dialog = MainWindow()
-
 
 

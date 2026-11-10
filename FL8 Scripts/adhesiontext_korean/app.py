@@ -12,8 +12,9 @@ from typerig.proxy.fl.gui.widgets import getProcessGlyphs
 
 from PythonQt import QtCore
 
-app_version = '1.01'
+
 app_name = 'Minwoo | adhesiontext Hangeul for Fontlab'
+app_version = '1.0.1'
 qapp = QtGui.QApplication.instance()
 flP = None
 EXTENSION_KEY = "com.Minwoo.adhesiontextForFontlab"
@@ -254,9 +255,12 @@ class Adhesiontext(QtGui.QWidget):
 
         windowPos = getExtensionDefault(EXTENSION_KEY, "windowPos")
         if not windowPos:
-            windowPos = (100, 100)
-
-        windowHeight = self.windowHeight
+            desktop_geo = qapp.desktop().geometry
+            center_x = desktop_geo.x() + int(desktop_geo.width() / 2) - int(self.windowWidth / 2)
+            center_y = desktop_geo.y() + int(desktop_geo.height() / 2) - int(self.windowHeight / 2)
+            windowPos = (center_x, center_y)
+            
+        self.setGeometry(windowPos[0], windowPos[1], self.windowWidth, self.windowHeight)
 
         self.QSS = """
 QWidget{
@@ -294,7 +298,6 @@ QLabel, QComboBox, QLineEdit{
         if not self.sliderValue:
             self.sliderValue = 50
                 
-        self.setGeometry(windowPos[0], windowPos[1], self.windowWidth, windowHeight)
         self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint) # Always on top!!
         qapp.applicationStateChanged.connect(self.setFlag)
 

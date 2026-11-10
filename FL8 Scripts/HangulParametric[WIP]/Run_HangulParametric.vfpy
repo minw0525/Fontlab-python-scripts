@@ -1,0 +1,26 @@
+#FLM: MW: Hangul Parametric
+
+import sys
+import importlib
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+def run():
+    previous = sys.modules.get('HangulParametric.app')
+    window = getattr(previous, '_window', None)
+    if window is not None and not window.close():
+        return window
+
+    importlib.invalidate_caches()
+    for name in ('model', 'inference', 'local_relations', 'mieum_relations', 'svc', 'fontlab_adapter', 'metrics', 'canvas', 'app'):
+        module = sys.modules.get('HangulParametric.' + name)
+        if module is not None:
+            importlib.reload(module)
+    from HangulParametric.app import show
+    return show()
+
+
+run()

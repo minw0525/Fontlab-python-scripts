@@ -1,10 +1,9 @@
 #FLM: MW: Generate Hangeul Composition
 
-import re, string
+import string
 from itertools import product
 
 import FL as legacy
-from fontgate import fgNametable
 import fontlab as fl6
 from typerig.proxy.fl.objects.font import * 
 
@@ -12,11 +11,10 @@ from typerig.proxy.fl.gui.widgets import *
 from typerig.proxy.fl.gui import QtGui
 from PythonQt import QtCore
 
-app_version = '1.12'
+app_version = '1.12.0'
 app_name = 'Minwoo | Generate Hangeul Composition'
 qapp = QtGui.QApplication.instance()
 flP = fl6.flPackage(fl6.CurrentFont())
-
 
 ################################################################################
 # Hangul Unicode Variables

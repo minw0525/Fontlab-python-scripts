@@ -1,4 +1,4 @@
-#FLM: MW: Edit Component Sources
+#FLM: MW: Expand Component Sources
 
 import fontlab as fl6
 import fontgate as fgt
@@ -7,6 +7,7 @@ import FL as legacy
 from typerig.proxy.fl.objects.font import pFont
 from typerig.proxy.fl.gui.widgets import getProcessGlyphs
 
+app_version = '1.0.0'
 pMode = 1
 # if mode == 0: [selected glyph]
 # if mode == 1: [glyphs in edit window]

@@ -4,8 +4,6 @@ import fontlab as fl6
 import fontgate as fgt
 
 from typerig.proxy.fl.objects.font import eFont
-from typerig.proxy.fl.objects.glyph import eGlyph
-from typerig.proxy.fl.objects.node import eNode
 from typerig.proxy.fl.application.app import *
 
 from PythonQt import QtCore
@@ -22,7 +20,7 @@ nT = fgt.fgNametable()
 
 
 # init ====
-app_name, app_version = 'Minwoo | Flag Glyphs', '1.0'
+app_name, app_version = 'Minwoo | Flag Glyphs', '1.0.0'
 
 # Config ====
 column_names = ['Index', 'Character', 'Name', 'Unicode', 'Tags']

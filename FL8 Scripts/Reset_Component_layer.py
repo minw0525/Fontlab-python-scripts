@@ -1,27 +1,26 @@
 #FLM: MW: Reset Component Layer
 
 import fontlab as fl6
-import fontgate as fgt
-
-from typerig.proxy.fl.objects.font import eFont
-from typerig.proxy.fl.objects.glyph import pGlyph
-from typerig.proxy.fl.objects.node import eNode
-from typerig.proxy.fl.objects.contour import pContour
-from typerig.proxy.fl.application.app import *
-from typerig.proxy.fl.application.app import pWorkspace
-
-from PythonQt import QtCore
-from typerig.proxy.fl.gui import QtGui
 from typerig.proxy.fl.gui.widgets import getProcessGlyphs
 
-glyphs = getProcessGlyphs(1)
-#0: Current Glyph
-#1: All Glyphs in Edit Window
-#2: Selected Glyphs in Font Window
-#3: All Glyphs in Font
+app_version = '1.0.1'
+workspace = fl6.flWorkspace.instance()
+
+if workspace.getActiveCanvas() is not None:
+    pMode = 1
+else :
+    pMode = 2
+
+# if mode == 0: [selected glyph]
+# if mode == 1: [glyphs in edit window]
+# if mode == 2: [selected glyphs in font window]
+# if mode == 3: [all glyphs in font]
+
+glyphs = getProcessGlyphs(pMode)
 
 for glyph in glyphs:
     layer = glyph.layer()
-    print(layer.name)
     for shape in layer.shapes:
-        shape.shapeData.componentLayer = layer.name
+        if shape.shapeData.componentLayer != layer.name:
+            shape.shapeData.componentLayer = layer.name
+            print(f"{glyph.name} :: Component({shape.shapeData.componentGlyph}) Location Reset")
