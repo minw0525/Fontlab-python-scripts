@@ -75,7 +75,7 @@ class ManagerWindow:
         self.filter = 'all'
         self.detail_dialog = None
         self.dialog = QtGui.QDialog()
-        self.dialog.setWindowTitle('MW Script Manager')
+        self.dialog.setWindowTitle(f"MW Script Manager {RUNTIME_VERSION}")
         self.dialog.setStyleSheet(STYLE)
         self.dialog.resize(760, 700)
         self.dialog.setMinimumSize(620, 480)

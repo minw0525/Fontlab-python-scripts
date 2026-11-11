@@ -20,7 +20,7 @@ import uuid
 REPOSITORY = 'minw0525/Fontlab-python-scripts'
 RAW = 'https://raw.githubusercontent.com/' + REPOSITORY + '/'
 CATALOG_URL = RAW + 'main/manifest.json'
-RUNTIME_VERSION = '0.2.1'
+RUNTIME_VERSION = '0.2.2'
 HTTPS_FALLBACK = None
 MAX_FILE = 32 * 1024 * 1024
 MAX_PACKAGE = 100 * 1024 * 1024
