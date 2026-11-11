@@ -2,8 +2,8 @@
   "schema_version": 1,
   "repository": "minw0525/Fontlab-python-scripts",
   "manager": {
-    "version": "0.2.0",
-    "source_ref": "656a87b83b63dc89a3a9a94842ae4a7d6b6438bb",
+    "version": "0.2.1",
+    "source_ref": "c86a539e1796401e5c85353b6f1a193da353b794",
     "files": [
       {
         "source": "manager/main.py",
@@ -13,7 +13,7 @@
       {
         "source": "manager/mwsm_core.py",
         "target": "mwsm_core.py",
-        "sha256": "722090a76862af28a3170d2ed1000c13f6cf8f8564ca2c6cd330099e6092b96b"
+        "sha256": "b744373eba0b9140222a485e8a0d1838cfdb3dcbb3e3461e828c9b1a1fa8bce6"
       },
       {
         "source": "manager/mwsm_host.py",
@@ -23,7 +23,7 @@
       {
         "source": "manager/mwsm_ui.py",
         "target": "mwsm_ui.py",
-        "sha256": "cfcf7c2f6d4196d3069828327f2753a8bf17c23fbf1b1c00439408804df4a894"
+        "sha256": "ce252dbcd2583f4cbc33fb8e51a8a7a55d7b2ad3cf2f850f81567932b891f1f6"
       }
     ]
   },
