@@ -1,0 +1,54 @@
+name: Publish script catalog
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'FL8 Scripts/**'
+      - 'manager/**'
+      - 'tools/release-scripts.json'
+      - 'tools/build_manifest.py'
+      - '.github/workflows/publish-catalog.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-script-catalog
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify and publish manifest
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          for attempt in 1 2 3; do
+            ref=$(git rev-parse HEAD)
+            python -m unittest discover -s tests -q
+            python tools/build_manifest.py --manager-ref "$ref" --scripts-ref "$ref" --source-root .
+            if git diff --quiet -- manifest.json; then
+              exit 0
+            fi
+            git add manifest.json
+            git commit -m 'Publish verified script catalog'
+            if git push origin HEAD:refs/heads/main; then
+              exit 0
+            fi
+            git fetch origin refs/heads/main
+            if [ "$(git rev-parse FETCH_HEAD)" = "$ref" ]; then
+              exit 1
+            fi
+            git switch --detach FETCH_HEAD
+          done
+          exit 1

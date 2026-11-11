@@ -3,7 +3,7 @@ import queue
 import threading
 from PythonQt import QtCore, QtGui
 
-from mwsm_core import Cancelled, Downloader, ManagerError, Store, REPOSITORY, RUNTIME_VERSION
+from mwsm_core import Cancelled, Downloader, ManagerError, Store, REPOSITORY, RUNTIME_VERSION, is_newer_version
 from mwsm_host import compatibility, refresh_scripts, prepare_https
 
 _windows = []
@@ -146,7 +146,7 @@ class ManagerWindow:
     def select_updates(self):
         state = self.store.read_state()
         self.checked = {p['id'] for p in self.rows if p['id'] in state['packages']
-                        and state['packages'][p['id']]['active_version'] != p['version']
+                        and is_newer_version(p['version'], state['packages'][p['id']]['active_version'])
                         and not state['packages'][p['id']]['pinned'] and not compatibility(p)}
         self.render()
 
@@ -277,7 +277,7 @@ class ManagerWindow:
         for p in items.values():
             key = p['id']
             record = state['packages'].get(key)
-            update = bool(record and record['active_version'] != p['version'])
+            update = bool(record and is_newer_version(p['version'], record['active_version']))
             if self.filter == 'installed' and not record:
                 continue
             if self.filter == 'updates' and not update:
@@ -309,7 +309,7 @@ class ManagerWindow:
             pick.setFixedSize(22, 22)
             pick.setEnabled(enabled)
             pick.setAccessibleName(p['name'] + ' 설치 선택')
-            pick.setToolTip(reason or ('버전 고정을 해제하면 업데이트할 수 있습니다.' if pinned else ('최신 버전이 설치되어 있습니다.' if record and not update else '이번에 설치할 항목 선택')))
+            pick.setToolTip(reason or ('버전 고정을 해제하면 업데이트할 수 있습니다.' if pinned else ('설치할 새 버전이 없습니다.' if record and not update else '이번에 설치할 항목 선택')))
             pick.connect('clicked()', lambda k=key, c=pick: self.choose(k, c))
             line.addWidget(pick)
             text = QtGui.QVBoxLayout()

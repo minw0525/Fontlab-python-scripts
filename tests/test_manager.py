@@ -176,6 +176,17 @@ class StoreTests(unittest.TestCase):
         self.assertEqual(self.store.updates(catalog, True), [])
         self.assertEqual(self.store.updates(catalog), [])
 
+    def test_lower_release_cannot_replace_installed_version(self):
+        installed = self.install('1.10.0')
+        older = self.add('1.9.0')
+        newer = self.add('1.11.0')
+        catalog = {'scripts': [older, newer]}
+        self.assertEqual(self.store.updates(catalog, automatic=True), [newer])
+        self.assertEqual(self.store.updates(catalog), [newer])
+        with self.assertRaisesRegex(ManagerError, '높은 버전'):
+            self.store.install(older)
+        self.store.verify(installed)
+
     def test_corrupt_state_explicit_backup_recovery(self):
         self.install()
         self.store.settings('sample', False, False)

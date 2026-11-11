@@ -33,24 +33,21 @@ FontLab 8 내장 Python/PythonQt에서 실행하는 선택형 스크립트 매�
 
 ## 개발자 배포 순서
 
-최초 배포에는 **코드 게시 → 카탈로그 게시** 두 단계가 필요합니다. 카탈로그 자신을 포함하는 미래 커밋의 SHA를 사전에 적을 수 없으므로, 실행 코드가 들어 있는 앞선 불변 커밋을 참조합니다.
+스크립트나 패키지 파일을 수정할 때 원본의 `app_version`을 올린 뒤 `main`에 푸시합니다. 새 패키지는 `tools/release-scripts.json`에 등록합니다. GitHub Actions가 공개 커밋의 버전과 SHA-256을 검증한 뒤 변경된 `manifest.json`을 `main`에 게시합니다. 이전 배포보다 낮은 버전이나 버전을 올리지 않은 파일 변경은 워크플로에서 거부됩니다.
 
-1. 이 프로젝트의 `manager/`, `MW_install.vfpy`, `tools/`을 지정된 공개 저장소에 추가합니다. 기존 `FL8 Scripts/` 소스를 덮어쓰지 않습니다.
-2. 런타임을 수정한 경우 `python3 tools/build_installer.py`로 설치기를 재생성합니다.
-3. 테스트를 실행하고 코드를 공개 저장소에 커밋·푸시합니다. 최초 0.1.0 코드 및 카탈로그는 게시되어 있습니다. 이후 릴리스에도 같은 순서를 따릅니다.
-4. 공개된 코드의 전체 40자리 커밋 SHA를 사용해 다음 명령을 실행합니다.
+매니저를 배포할 때는 `RUNTIME_VERSION`과 설치기의 버전 확인 값을 올리고 `python3 tools/build_installer.py`를 실행합니다. 매니저 코드가 `main`에 올라가면 같은 워크플로가 새 런타임을 카탈로그에 반영합니다. 기존 사용자는 **설정 → 매니저 업데이트 / 복구** 후 FontLab을 재시작하면 됩니다.
+
+수동으로 생성하거나 확인하려면 공개된 전체 40자리 커밋 SHA를 지정합니다.
 
 ```sh
-python3 tools/build_manifest.py --manager-ref MANAGER_COMMIT_SHA --scripts-ref SCRIPTS_COMMIT_SHA
+python3 tools/build_manifest.py --manager-ref MANAGER_COMMIT_SHA --scripts-ref SCRIPTS_COMMIT_SHA --source-root .
 ```
-
-두 커밋은 공개 GitHub의 전체 40자리 SHA를 지정합니다. 생성기는 스크립트 원본의 `app_version`을 읽고, 배포 파일의 SHA-256을 계산합니다. 스크립트를 수정하거나 이름을 바꾸면 원본의 버전을 올려 공개한 뒤 카탈로그를 다시 생성하고 커밋하세요. 매니저 버전은 `--manager-version`으로 지정합니다. `--source-root`는 로컬 원본과 원격 파일의 바이트 일치까지 확인합니다.
 
 macOS의 개발용 Python에서 CA 경로 누락 오류가 발생하면 기존 시스템 CA를 명시할 수 있습니다. `SSL_CERT_FILE=/etc/ssl/cert.pem python3 tools/build_manifest.py --manager-ref MANAGER_COMMIT_SHA --scripts-ref SCRIPTS_COMMIT_SHA`로 실행하며 인증서 검증은 유지합니다. 이는 FontLab 내부의 `_ssl` 라이브러리 누락과는 다른 문제입니다.
 
 생성기는 코드와 자산을 고정 커밋에서 개별 다운로드하고 실제 SHA-256을 계산합니다. 매니저의 로컬 코드와 원격 코드가 다르거나 404가 발생하면 출력을 만들지 않습니다. 동일 ID/버전의 파일 내용 변경은 설치 시에도 거부합니다.
 
-5. 생성한 **루트 `manifest.json`만 후속 커밋으로 게시**합니다. 가짜 커밋 SHA가 들어간 배포용 매니페스트는 제공하지 않습니다.
+수동 배포 시 생성한 **루트 `manifest.json`만 후속 커밋으로 게시**합니다. 가짜 커밋 SHA가 들어간 배포용 매니페스트는 제공하지 않습니다.
 6. SSL이 동작하는 macOS 및 Windows FontLab에서 최초 설치와 PRD 수용 테스트를 수행한 후 정식 출시합니다. 현재는 미리보기 배포입니다.
 
 ## 테스트

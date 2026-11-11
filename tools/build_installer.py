@@ -16,7 +16,7 @@ _MW_SOURCES = %r
 
 def _mw_install():
     loaded = sys.modules.get("mwsm_core")
-    if loaded is not None and getattr(loaded, "RUNTIME_VERSION", None) != "0.2.0":
+    if loaded is not None and getattr(loaded, "RUNTIME_VERSION", None) != "0.2.1":
         raise RuntimeError("FontLab을 재시작한 뒤 새 설치기를 다시 실행하세요.")
     # Never replace a live runtime: Qt widgets may still hold references to it.
     for name, source in _MW_SOURCES.items():

@@ -20,7 +20,7 @@ import uuid
 REPOSITORY = 'minw0525/Fontlab-python-scripts'
 RAW = 'https://raw.githubusercontent.com/' + REPOSITORY + '/'
 CATALOG_URL = RAW + 'main/manifest.json'
-RUNTIME_VERSION = '0.2.0'
+RUNTIME_VERSION = '0.2.1'
 HTTPS_FALLBACK = None
 MAX_FILE = 32 * 1024 * 1024
 MAX_PACKAGE = 100 * 1024 * 1024
@@ -37,6 +37,17 @@ class Cancelled(ManagerError):
 
 def digest(data):
     return hashlib.sha256(data).hexdigest()
+
+
+def version_number(version):
+    if re.fullmatch(r'(?:0|[1-9][0-9]*)[.](?:0|[1-9][0-9]*)[.](?:0|[1-9][0-9]*)', version):
+        return tuple(map(int, version.split('.')))
+    return None
+
+
+def is_newer_version(candidate, installed):
+    new, old = version_number(candidate), version_number(installed)
+    return new is not None and old is not None and new > old
 
 
 def token(value):
@@ -513,6 +524,8 @@ class Store:
             if not (self.root / 'state.json').exists():
                 self.save_state(state)
             record = state['manager'] if manager else state['packages'].get(package_id)
+            if record and p['version'] != record['active_version'] and not is_newer_version(p['version'], record['active_version']):
+                raise ManagerError('설치 버전보다 높은 버전만 업데이트할 수 있습니다.')
             key = ('manager' if manager else 'packages/' + package_id) + '/' + p['version']
             fingerprint = digest(json_bytes(sorted(p['files'], key=lambda f: f['target'])))
             if key in state['history'] and state['history'][key] != fingerprint:
@@ -618,7 +631,7 @@ class Store:
     def updates(self, catalog, automatic=False):
         state = self.read_state()
         return [p for p in catalog['scripts'] if p['id'] in state['packages']
-                and p['version'] != state['packages'][p['id']]['active_version']
+                and is_newer_version(p['version'], state['packages'][p['id']]['active_version'])
                 and not state['packages'][p['id']]['pinned']
                 and (not automatic or state['packages'][p['id']]['auto_update'])]
 
